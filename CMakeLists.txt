@@ -20,7 +20,18 @@ endif()
 
 find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
 
-add_executable(${PROJECT_NAME} main.cpp main_window.cpp)
+# Add the include directory to the project
+include_directories(src)
+
+# Add your resource file
+set(RESOURCES
+    src/resources.qrc
+)
+
+# Generate rules for building source files from the resources
+qt5_add_resources(RESOURCE_FILES ${RESOURCES})
+
+add_executable(${PROJECT_NAME} src/main.cpp src/main_window.cpp src/image_loader.cpp ${RESOURCE_FILES})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core Qt5::Widgets)
 
