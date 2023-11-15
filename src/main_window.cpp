@@ -2,10 +2,10 @@
 
 MainWindow::MainWindow() : QMainWindow() {
 
-  QWidget *mainWidget = new QWidget();
+  //   QWidget *mainWidget = new QWidget();
 
-  // Create a QVBoxLayout for the main layout
-  QVBoxLayout *mainLayout = new QVBoxLayout(this);
+  //   // Create a QVBoxLayout for the main layout
+  //   QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
   // Set a dark color palette
   QPalette darkPalette;
@@ -26,8 +26,8 @@ MainWindow::MainWindow() : QMainWindow() {
   // Apply the dark color palette to the application
   setPalette(darkPalette);
 
-  // Create a QLabel with a QPixmap as its canvas
-  canvasLabel.setAlignment(Qt::AlignCenter);
+  //   // Create a QLabel with a QPixmap as its canvas
+  //   canvasLabel.setAlignment(Qt::AlignCenter);
 
   // Create a fixed-size QPixmap on startup
   QRect primaryScreenGeometry = QApplication::primaryScreen()->geometry();
@@ -36,10 +36,10 @@ MainWindow::MainWindow() : QMainWindow() {
   QSize canvasSize = primaryScreenGeometry.size() * 0.80;
   fixedPixmap = QPixmap(canvasSize);    // Set your desired size
   fixedPixmap.fill(QColor(25, 25, 25)); // Fill with a dark background
-  canvasLabel.setPixmap(fixedPixmap);
+                                        //   canvasLabel.setPixmap(fixedPixmap);
 
-  // Add the splitter to the main layout
-  mainLayout->addWidget(&canvasLabel);
+  //   // Add the splitter to the main layout
+  //   mainLayout->addWidget(&canvasLabel);
 
   // Create the image loader and move it to a separate thread
   imageLoader = new ImageLoader;
@@ -68,8 +68,9 @@ MainWindow::MainWindow() : QMainWindow() {
   // Add the "Open" action to the "File" menu
   fileMenu->addAction(openAction);
 
-  mainWidget->setLayout(mainLayout);
-  setCentralWidget(mainWidget);
+  // Create a imageViewer to display the image
+  imageViewer = new ImageViewer();
+  setCentralWidget(imageViewer);
 }
 
 void MainWindow::openImage() {
@@ -90,8 +91,9 @@ void MainWindow::onImageLoaded(const QPixmap &imagePixmap,
   scaledPixmap = imagePixmapScaled;
   originalWidth = width;
   originalHeight = height;
+
   // Set the resized image to the QLabel
-  canvasLabel.setPixmap(imagePixmapScaled);
+  imageViewer->setPixmap(imagePixmap);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {

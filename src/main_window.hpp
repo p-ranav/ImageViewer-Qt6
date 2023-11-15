@@ -16,6 +16,7 @@
 #include <QMainWindow>
 #include <QToolButton>
 #include <QMenuBar>
+#include "image_viewer.hpp"
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -50,4 +51,6 @@ private:
 
   ImageLoader *imageLoader;
   QThread *imageLoaderThread;
+
+  ImageViewer *imageViewer;
 };
