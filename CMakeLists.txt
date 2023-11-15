@@ -20,6 +20,10 @@ endif()
 
 find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
 
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} main.cpp main_window.cpp)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core Qt5::Widgets)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    AUTOMOC ON
+)
