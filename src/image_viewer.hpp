@@ -23,6 +23,14 @@ public:
     }
     void setPixmap(const QPixmap &pixmap) {
         m_item.setPixmap(pixmap);
+
+        // Enable smooth transformation by setting interpolation mode
+        m_item.setTransformationMode(Qt::SmoothTransformation);
+        m_item.pixmap().setDevicePixelRatio(devicePixelRatioF());
+        m_item.pixmap().setDevicePixelRatio(pixmap.devicePixelRatioF());
+        m_item.pixmap().setDevicePixelRatio(1.0);
+        m_item.pixmap().setDevicePixelRatio(devicePixelRatioF());
+
         auto offset = -QRectF(pixmap.rect()).center();
         m_item.setOffset(offset);
         setSceneRect(offset.x()*4, offset.y()*4, -offset.x()*8, -offset.y()*8);

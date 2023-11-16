@@ -62,7 +62,7 @@ MainWindow::MainWindow() : QMainWindow() {
   QMenu *fileMenu = menuBar->addMenu("File");
 
   // Create an "Open" action
-  QAction *openAction = new QAction("Open", this);
+  QAction *openAction = new QAction("Open...", this);
   connect(openAction, &QAction::triggered, this, &MainWindow::openImage);
 
   // Add the "Open" action to the "File" menu
@@ -71,6 +71,8 @@ MainWindow::MainWindow() : QMainWindow() {
   // Create a imageViewer to display the image
   imageViewer = new ImageViewer();
   setCentralWidget(imageViewer);
+
+  openImage();
 }
 
 void MainWindow::openImage() {
@@ -80,6 +82,8 @@ void MainWindow::openImage() {
 
   if (!imagePath.isEmpty()) {
     // Emit a signal to load the image in a separate thread
+
+    load_start_time = std::chrono::high_resolution_clock::now();
     emit loadImage(imagePath, fixedPixmap.size());
   }
 }
@@ -94,6 +98,11 @@ void MainWindow::onImageLoaded(const QPixmap &imagePixmap,
 
   // Set the resized image to the QLabel
   imageViewer->setPixmap(imagePixmap);
+  load_end_time = std::chrono::high_resolution_clock::now();
+  std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(
+                   load_end_time - load_start_time)
+                   .count()
+            << "ms\n";
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {

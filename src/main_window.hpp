@@ -17,6 +17,8 @@
 #include <QToolButton>
 #include <QMenuBar>
 #include "image_viewer.hpp"
+#include <chrono>
+#include <iostream>
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -53,4 +55,6 @@ private:
   QThread *imageLoaderThread;
 
   ImageViewer *imageViewer;
+  std::chrono::time_point<std::chrono::high_resolution_clock> load_start_time;
+  std::chrono::time_point<std::chrono::high_resolution_clock> load_end_time;
 };
