@@ -6,12 +6,11 @@
 #include <QPoint>
 #include <QPinchGesture>
 #include <QtWidgets>
+#include <iostream>
 
 class ImageViewer : public QGraphicsView {
     QGraphicsScene m_scene;
     QGraphicsPixmapItem m_item;
-	qreal m_widthScale;
-	qreal m_heightScale;
 public:
     ImageViewer() {
         setScene(&m_scene);
@@ -21,20 +20,24 @@ public:
         setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         setResizeAnchor(QGraphicsView::AnchorViewCenter);
     }
-    void setPixmap(const QPixmap &pixmap, const QSize& windowSize) {
+
+void setPixmap(const QPixmap &pixmap, int desiredHeight) {
+    // Reset transformation before setting the new pixmap
+    m_item.resetTransform();
+
     // Set the QGraphicsPixmapItem's pixmap
     m_item.setPixmap(pixmap);
 
     // Enable smooth transformation by setting interpolation mode
     m_item.setTransformationMode(Qt::SmoothTransformation);
 
-    // Calculate the scale factors to fit the window size
-    qreal widthScale = static_cast<qreal>(windowSize.width()) / pixmap.width();
-    qreal heightScale = static_cast<qreal>(windowSize.height()) / pixmap.height();
+    // Calculate the scale factor to achieve the desired height
+    qreal scaleFactor = static_cast<qreal>(desiredHeight) / pixmap.height();
 
-    // Choose the minimum scale factor to fit both width and height
-    qreal scaleFactor = qMin(widthScale, heightScale);
+    std::cout << desiredHeight << " vs " << pixmap.height() << std::endl;
 
+    // Scale the QGraphicsPixmapItem
+    QGraphicsView::resetTransform();
     scale(scaleFactor);
 
     // Center the QGraphicsPixmapItem in the window
@@ -43,12 +46,10 @@ public:
 
     // Set the scene rect
     m_scene.setSceneRect(-pixmap.width() / 2.0, -pixmap.height() / 2.0,
-                        pixmap.width(), pixmap.height());
+                         pixmap.width(), pixmap.height());
+}
 
-
-    }
     void scale(qreal s) { QGraphicsView::scale(s, s); }
-    QSize sizeHint() const override { return {400, 400}; }
 protected:
 
     bool event(QEvent *event) override {
