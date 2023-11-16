@@ -30,7 +30,7 @@ public:
 public slots:
   void openImage();
 
-  void onImageLoaded(const QPixmap &imagePixmap, const QPixmap &imagePixmapScaled, int width, int height);
+  void onImageLoaded(const QPixmap &imagePixmap);
 
 protected:
   void closeEvent(QCloseEvent *event) override;
@@ -43,12 +43,6 @@ private:
   QToolBar *toolBar;
 
   QLabel canvasLabel;
-  
-  QPixmap originalPixmap;
-  int originalWidth;
-  int originalHeight;
-
-  QPixmap scaledPixmap;
   QPixmap fixedPixmap;
 
   ImageLoader *imageLoader;

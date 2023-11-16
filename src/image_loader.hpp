@@ -18,5 +18,5 @@ public slots:
   void loadImage(const QString &imagePath, const QSize &targetSize);
 
 signals:
-  void imageLoaded(const QPixmap &imagePixmap, const QPixmap &imagePixmapScaled, int width, int height);
+  void imageLoaded(const QPixmap &imagePixmap);
 };

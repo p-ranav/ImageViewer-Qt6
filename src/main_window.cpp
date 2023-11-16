@@ -82,7 +82,7 @@ void MainWindow::openImage() {
       "*.pgm *.ppm *.tiff *.webp *.xbm *.xpm)";
 
   QString imagePath = QFileDialog::getOpenFileName(
-      this, "Open Image", QDir::homePath(), fileFilter);
+      this, "Open Image", /*QDir::homePath()*/ "", fileFilter);
 
   if (!imagePath.isEmpty()) {
     // Emit a signal to load the image in a separate thread
@@ -92,15 +92,7 @@ void MainWindow::openImage() {
   }
 }
 
-void MainWindow::onImageLoaded(const QPixmap &imagePixmap,
-                               const QPixmap &imagePixmapScaled,
-                               int imageOriginalWidth,
-                               int imageOriginalHeight) {
-  originalPixmap = imagePixmap;
-  scaledPixmap = imagePixmapScaled;
-  originalWidth = imageOriginalWidth;
-  originalHeight = imageOriginalHeight;
-
+void MainWindow::onImageLoaded(const QPixmap &imagePixmap) {
   // Set the resized image to the QLabel
   imageViewer->setPixmap(imagePixmap, height() * 0.80);
   load_end_time = std::chrono::high_resolution_clock::now();

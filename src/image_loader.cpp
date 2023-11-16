@@ -20,6 +20,8 @@ void ImageLoader::loadImage(const QString &imagePath, const QSize &targetSize) {
 
     // Convert QImage to QPixmap and display it
     imagePixmap = QPixmap::fromImage(image);
+
+    m_rawProcessor.dcraw_clear_mem(processed_image);
   } else {
     QImageReader imageReader(imagePath);
     imageReader.setAutoTransform(true);
@@ -34,9 +36,5 @@ void ImageLoader::loadImage(const QString &imagePath, const QSize &targetSize) {
     imagePixmap = QPixmap::fromImage(image);
   }
 
-  auto width = imagePixmap.width();
-  auto height = imagePixmap.height();
-  auto imagePixmapScaled = imagePixmap.scaled(targetSize, Qt::KeepAspectRatio,
-                                              Qt::SmoothTransformation);
-  emit imageLoaded(imagePixmap, imagePixmapScaled, width, height);
+  emit imageLoaded(imagePixmap);
 }
