@@ -21,34 +21,31 @@ public:
         setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         setResizeAnchor(QGraphicsView::AnchorViewCenter);
     }
-    void setPixmap(const QPixmap &pixmap) {
-        m_item.setPixmap(pixmap);
+    void setPixmap(const QPixmap &pixmap, const QSize& windowSize) {
+    // Set the QGraphicsPixmapItem's pixmap
+    m_item.setPixmap(pixmap);
 
-        // Enable smooth transformation by setting interpolation mode
-        m_item.setTransformationMode(Qt::SmoothTransformation);
-        m_item.pixmap().setDevicePixelRatio(devicePixelRatioF());
-        m_item.pixmap().setDevicePixelRatio(pixmap.devicePixelRatioF());
-        m_item.pixmap().setDevicePixelRatio(1.0);
-        m_item.pixmap().setDevicePixelRatio(devicePixelRatioF());
+    // Enable smooth transformation by setting interpolation mode
+    m_item.setTransformationMode(Qt::SmoothTransformation);
 
-        auto offset = -QRectF(pixmap.rect()).center();
-        m_item.setOffset(offset);
-        setSceneRect(offset.x()*4, offset.y()*4, -offset.x()*8, -offset.y()*8);
-        translate(1, 1);
+    // Calculate the scale factors to fit the window size
+    qreal widthScale = static_cast<qreal>(windowSize.width()) / pixmap.width();
+    qreal heightScale = static_cast<qreal>(windowSize.height()) / pixmap.height();
 
-		QRect primaryScreenGeometry = QApplication::primaryScreen()->geometry();
-		QSize canvasSize = primaryScreenGeometry.size() * 0.80;
+    // Choose the minimum scale factor to fit both width and height
+    qreal scaleFactor = qMin(widthScale, heightScale);
 
-		// Convert width to qreal
-		qreal widthAsQReal = static_cast<qreal>(canvasSize.width());
+    scale(scaleFactor);
 
-		// Convert height to qreal
-		qreal heightAsQReal = static_cast<qreal>(canvasSize.height());
+    // Center the QGraphicsPixmapItem in the window
+    auto offset = -QRectF(pixmap.rect()).center();
+    m_item.setOffset(offset);
 
-		m_heightScale = heightAsQReal / pixmap.height();
-		m_widthScale = widthAsQReal / pixmap.width();
+    // Set the scene rect
+    m_scene.setSceneRect(-pixmap.width() / 2.0, -pixmap.height() / 2.0,
+                        pixmap.width(), pixmap.height());
 
-		scale(m_heightScale);
+
     }
     void scale(qreal s) { QGraphicsView::scale(s, s); }
     QSize sizeHint() const override { return {400, 400}; }

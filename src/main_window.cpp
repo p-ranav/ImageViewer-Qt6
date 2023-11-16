@@ -93,15 +93,16 @@ void MainWindow::openImage() {
 }
 
 void MainWindow::onImageLoaded(const QPixmap &imagePixmap,
-                               const QPixmap &imagePixmapScaled, int width,
-                               int height) {
+                               const QPixmap &imagePixmapScaled,
+                               int imageOriginalWidth,
+                               int imageOriginalHeight) {
   originalPixmap = imagePixmap;
   scaledPixmap = imagePixmapScaled;
-  originalWidth = width;
-  originalHeight = height;
+  originalWidth = imageOriginalWidth;
+  originalHeight = imageOriginalHeight;
 
   // Set the resized image to the QLabel
-  imageViewer->setPixmap(imagePixmap);
+  imageViewer->setPixmap(imagePixmap, size());
   load_end_time = std::chrono::high_resolution_clock::now();
   std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(
                    load_end_time - load_start_time)
