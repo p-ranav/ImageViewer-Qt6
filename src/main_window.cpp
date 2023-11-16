@@ -60,8 +60,14 @@ MainWindow::MainWindow() : QMainWindow() {
   QAction *openAction = new QAction("Open...", this);
   connect(openAction, &QAction::triggered, this, &MainWindow::openImage);
 
+  // Create a "Quick Export as a PNG" action
+  QAction *quickExportAction = new QAction("Quick Export as a PNG", this);
+  connect(quickExportAction, &QAction::triggered, this,
+          &MainWindow::quickExportAsPng);
+
   // Add the "Open" action to the "File" menu
   fileMenu->addAction(openAction);
+  fileMenu->addAction(quickExportAction);
 
   // Create a imageViewer to display the image
   imageViewer = new ImageViewer();
@@ -84,6 +90,29 @@ void MainWindow::openImage() {
 
     load_start_time = std::chrono::high_resolution_clock::now();
     emit loadImage(imagePath);
+  }
+}
+
+void MainWindow::quickExportAsPng() {
+  // Get a file name for saving the PNG
+  QString saveFileName = QFileDialog::getSaveFileName(nullptr, "Save PNG File",
+                                                      "", "PNG Files (*.png)");
+
+  if (saveFileName.isEmpty()) {
+    // User canceled the operation or didn't provide a file name
+    return;
+  }
+
+  // Ensure the file extension is .png
+  if (!saveFileName.toLower().endsWith(".png")) {
+    saveFileName += ".png";
+  }
+
+  // Save the image as a PNG file
+  if (imageViewer->pixmap().save(saveFileName, "PNG")) {
+    qDebug() << "Image saved successfully as" << saveFileName;
+  } else {
+    qDebug() << "Error saving image";
   }
 }
 

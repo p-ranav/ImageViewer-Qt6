@@ -29,6 +29,7 @@ public:
 
 public slots:
   void openImage();
+  void quickExportAsPng();
 
   void onImageLoaded(const QPixmap &imagePixmap);
 

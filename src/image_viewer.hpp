@@ -49,6 +49,10 @@ void setPixmap(const QPixmap &pixmap, int desiredHeight) {
                          pixmap.width(), pixmap.height());
 }
 
+  QPixmap pixmap() const {
+    return m_item.pixmap();
+  }
+
     void scale(qreal s) { QGraphicsView::scale(s, s); }
 protected:
 
