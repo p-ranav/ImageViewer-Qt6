@@ -1,6 +1,6 @@
 ```console
 mkdir build
 cd build
-cmake -DQt5_DIR=$(brew --prefix qt5)/lib/cmake/Qt5 ..
+cmake -DQt6_DIR=$(brew --prefix qt6)/lib/cmake/Qt6 ..
 make
 ```

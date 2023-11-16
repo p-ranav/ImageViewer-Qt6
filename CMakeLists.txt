@@ -18,7 +18,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 endif()
 
-find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
+find_package(Qt6 COMPONENTS Core Widgets REQUIRED)
 
 # Add the include directory to the project
 include_directories(src)
@@ -29,11 +29,11 @@ set(RESOURCES
 )
 
 # Generate rules for building source files from the resources
-qt5_add_resources(RESOURCE_FILES ${RESOURCES})
+qt6_add_resources(RESOURCE_FILES ${RESOURCES})
 
 add_executable(${PROJECT_NAME} src/main.cpp src/main_window.cpp src/image_loader.cpp ${RESOURCE_FILES})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core Qt5::Widgets)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     AUTOMOC ON

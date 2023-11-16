@@ -77,8 +77,10 @@ MainWindow::MainWindow() : QMainWindow() {
 
 void MainWindow::openImage() {
   // Open a file dialog to select an image
+  QString fileFilter = "Images (*.png *.jpg *.jpeg *.bmp *.gif *.pbm *.pgm *.ppm *.xbm *.xpm)";
+
   QString imagePath = QFileDialog::getOpenFileName(
-      this, "Open Image", "", "Images (*.png *.jpg *.bmp)");
+      this, "Open Image", QDir::homePath(), fileFilter);
 
   if (!imagePath.isEmpty()) {
     // Emit a signal to load the image in a separate thread
