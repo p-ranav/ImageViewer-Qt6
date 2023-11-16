@@ -77,7 +77,7 @@ MainWindow::MainWindow() : QMainWindow() {
 
 void MainWindow::openImage() {
   // Open a file dialog to select an image
-  QString fileFilter = "Images (*.png *.jpg *.jpeg *.bmp *.gif *.pbm *.pgm *.ppm *.xbm *.xpm)";
+  QString fileFilter = "Images (*.png *.jpg *.jpeg *.jp2 *.bmp *.gif *.heic *.icns *.pbm *.pgm *.ppm *.tiff *.webp *.xbm *.xpm)";
 
   QString imagePath = QFileDialog::getOpenFileName(
       this, "Open Image", QDir::homePath(), fileFilter);
