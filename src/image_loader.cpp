@@ -24,6 +24,7 @@ void ImageLoader::loadImage(const QString &imagePath) {
     m_rawProcessor.dcraw_clear_mem(processed_image);
   } else {
     QImageReader imageReader(imagePath);
+    imageReader.setAllocationLimit(0);
     imageReader.setAutoTransform(true);
 
     QImage image = imageReader.read();
