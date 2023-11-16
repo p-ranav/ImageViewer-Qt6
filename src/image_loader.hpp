@@ -15,7 +15,7 @@ class ImageLoader : public QObject {
   LibRaw m_rawProcessor;
 
 public slots:
-  void loadImage(const QString &imagePath, const QSize &targetSize);
+  void loadImage(const QString &imagePath);
 
 signals:
   void imageLoaded(const QPixmap &imagePixmap);

@@ -33,11 +33,6 @@ MainWindow::MainWindow() : QMainWindow() {
   QRect primaryScreenGeometry = QApplication::primaryScreen()->geometry();
   setGeometry(primaryScreenGeometry);
 
-  QSize canvasSize = primaryScreenGeometry.size() * 0.80;
-  fixedPixmap = QPixmap(canvasSize);    // Set your desired size
-  fixedPixmap.fill(QColor(25, 25, 25)); // Fill with a dark background
-                                        //   canvasLabel.setPixmap(fixedPixmap);
-
   //   // Add the splitter to the main layout
   //   mainLayout->addWidget(&canvasLabel);
 
@@ -88,7 +83,7 @@ void MainWindow::openImage() {
     // Emit a signal to load the image in a separate thread
 
     load_start_time = std::chrono::high_resolution_clock::now();
-    emit loadImage(imagePath, fixedPixmap.size());
+    emit loadImage(imagePath);
   }
 }
 

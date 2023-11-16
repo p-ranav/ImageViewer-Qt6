@@ -36,14 +36,10 @@ protected:
   void closeEvent(QCloseEvent *event) override;
 
 signals:
-  void loadImage(const QString &imagePath, const QSize &targetSize);
+  void loadImage(const QString &imagePath);
 
 private:
-
-  QToolBar *toolBar;
-
   QLabel canvasLabel;
-  QPixmap fixedPixmap;
 
   ImageLoader *imageLoader;
   QThread *imageLoaderThread;

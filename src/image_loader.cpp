@@ -1,7 +1,7 @@
 #include "image_loader.hpp"
 #include <iostream>
 
-void ImageLoader::loadImage(const QString &imagePath, const QSize &targetSize) {
+void ImageLoader::loadImage(const QString &imagePath) {
 
   QFileInfo fileInfo(imagePath);
   QPixmap imagePixmap;
