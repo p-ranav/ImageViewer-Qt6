@@ -33,7 +33,8 @@ qt6_add_resources(RESOURCE_FILES ${RESOURCES})
 
 add_executable(${PROJECT_NAME} src/main.cpp src/main_window.cpp src/image_loader.cpp ${RESOURCE_FILES})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets)
+target_include_directories(${PROJECT_NAME} PRIVATE ${LibRaw_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${LibRaw_LIBRARIES} Qt6::Core Qt6::Widgets)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     AUTOMOC ON
