@@ -13,3 +13,11 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=Release -DLibRaw_INCLUDE_DIRS=$(pkg-config --cflags libraw) -DLibRaw_LIBRARIES=$(pkg-config --libs libraw) ..
 make
 ```
+
+For older versions of Ubuntu,
+
+```console
+sudo add-apt-repository ppa:okirby/qt6-backports
+sudo apt update
+sudo apt install qt6-base-dev
+```
