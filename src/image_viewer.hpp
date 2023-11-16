@@ -9,19 +9,20 @@
 #include <iostream>
 
 class ImageViewer : public QGraphicsView {
-    QGraphicsScene m_scene;
-    QGraphicsPixmapItem m_item;
-public:
-    ImageViewer() {
-        setScene(&m_scene);
-        m_scene.addItem(&m_item);
-        setDragMode(QGraphicsView::ScrollHandDrag);
-        setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        setResizeAnchor(QGraphicsView::AnchorViewCenter);
-    }
+  QGraphicsScene m_scene;
+  QGraphicsPixmapItem m_item;
 
-void setPixmap(const QPixmap &pixmap, int desiredHeight) {
+public:
+  ImageViewer() {
+    setScene(&m_scene);
+    m_scene.addItem(&m_item);
+    setDragMode(QGraphicsView::ScrollHandDrag);
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setResizeAnchor(QGraphicsView::AnchorViewCenter);
+  }
+
+  void setPixmap(const QPixmap &pixmap, int desiredHeight) {
     // Reset transformation before setting the new pixmap
     m_item.resetTransform();
 
@@ -47,49 +48,62 @@ void setPixmap(const QPixmap &pixmap, int desiredHeight) {
     // Set the scene rect
     m_scene.setSceneRect(-pixmap.width() / 2.0, -pixmap.height() / 2.0,
                          pixmap.width(), pixmap.height());
-}
-
-  QPixmap pixmap() const {
-    return m_item.pixmap();
   }
 
-    void scale(qreal s) { QGraphicsView::scale(s, s); }
+  QPixmap pixmap() const { return m_item.pixmap(); }
+
+  void scale(qreal s) { QGraphicsView::scale(s, s); }
+
 protected:
+  bool event(QEvent *event) override {
+    if (event->type() == QEvent::NativeGesture) {
+      return nativeGestureEvent(static_cast<QNativeGestureEvent *>(event));
+    } else if (event->type() == QEvent::Wheel) {
+      wheelEvent(static_cast<QWheelEvent *>(event));
+      return true;
+    } else {
+      return QGraphicsView::event(event);
+    }
+  }
 
-    bool event(QEvent *event) override {
-        if (event->type() == QEvent::NativeGesture) {
-            return nativeGestureEvent(static_cast<QNativeGestureEvent*>(event));
-        } else {
-            return QGraphicsView::event(event);
-        }
+  void wheelEvent(QWheelEvent *event) override {
+    if (event->angleDelta().y() > 0) {
+      // Zooming in (zooming up)
+      scale(1.05);
+    } else {
+      // Zooming out (zooming down)
+      scale(0.95);
+    }
+  }
+
+  bool nativeGestureEvent(QNativeGestureEvent *event) {
+    if (event->gestureType() == Qt::ZoomNativeGesture) {
+      qreal scaleFactor = event->value();
+
+      if (scaleFactor > 0.0) {
+        // Zooming in (zooming up)
+        scale(1.05);
+      } else if (scaleFactor < 0.0) {
+        // Zooming out (zooming down)
+        scale(0.95);
+      }
+
+      return true;
     }
 
-    bool nativeGestureEvent(QNativeGestureEvent *event) {
-        if (event->gestureType() == Qt::ZoomNativeGesture) {
-            qreal scaleFactor = event->value();
+    return false;
+  }
 
-            if (scaleFactor > 0.0) {
-                // Zooming in (zooming up)
-                scale(1.05);
-            } else if (scaleFactor < 0.0) {
-                // Zooming out (zooming down)
-                scale(0.95);
-            }
-
-            return true;
-        }
-
-        return false;
+  void keyPressEvent(QKeyEvent *event) override {
+    if (event->modifiers() == Qt::ControlModifier &&
+        event->key() == Qt::Key_I) {
+      scale(0.8);
+    } else if (event->modifiers() == Qt::ControlModifier &&
+               event->key() == Qt::Key_P) {
+      scale(1.2);
+    } else {
+      // Call the base class implementation for other key events
+      QGraphicsView::keyPressEvent(event);
     }
-
-    void keyPressEvent(QKeyEvent *event) override {
-        if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_I) {
-            scale(0.8);
-        } else if (event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_P) {
-            scale(1.2);
-        } else {
-            // Call the base class implementation for other key events
-            QGraphicsView::keyPressEvent(event);
-        }
-    }
+  }
 };
