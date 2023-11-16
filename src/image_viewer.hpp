@@ -74,6 +74,7 @@ protected:
       // Zooming out (zooming down)
       scale(0.95);
     }
+    QGraphicsView::wheelEvent(event);
   }
 
   bool nativeGestureEvent(QNativeGestureEvent *event) {
