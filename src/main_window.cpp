@@ -91,6 +91,7 @@ void MainWindow::openImage() {
   if (!imagePath.isEmpty()) {
     // Emit a signal to load the image in a separate thread
 
+    imageLoader->resetImageFilePaths();
     emit loadImage(imagePath);
   }
 }

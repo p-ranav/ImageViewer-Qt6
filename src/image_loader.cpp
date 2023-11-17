@@ -86,6 +86,11 @@ void ImageLoader::loadImageIntoPixmap(const QString &imagePath,
   }
 }
 
+void ImageLoader::resetImageFilePaths() {
+  m_imageFilePaths.clear();
+  m_currentIndex = 0;
+}
+
 void ImageLoader::loadImage(const QString &imagePath) {
 
   QFileInfo fileInfo(imagePath);

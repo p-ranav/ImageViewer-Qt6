@@ -27,6 +27,9 @@ class ImageLoader : public QObject {
   void loadWithImageReader(const QString &imagePath, QPixmap& imagePixmap);
   void loadImageIntoPixmap(const QString &imagePath, QPixmap& imagePixmap);
 
+public:
+  void resetImageFilePaths();
+
 public slots:
   void loadImage(const QString &imagePath);
   void nextImage(const QPixmap &currentPixmap);
