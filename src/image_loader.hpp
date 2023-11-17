@@ -11,6 +11,7 @@
 #include <vector>
 #include <string>
 #include <QDir>
+#include <QFile>
 #include <libexif/exif-data.h>
 
 class ImageLoader : public QObject {
@@ -43,6 +44,9 @@ public slots:
   bool hasPrevious() const;
   void previousImage(const QPixmap &currentPixmap);
 
+  void deleteCurrentImage(const QPixmap &currentPixmap);
+
 signals:
   void imageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap);
+  void noMoreImagesLeft();
 };

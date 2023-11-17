@@ -33,6 +33,7 @@ public slots:
   void quickExportAsPng();
   void copyToClipboard();
   void onImageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap);
+  void onNoMoreImagesLeft();
 
 protected:
   bool event(QEvent* event) override;
@@ -43,6 +44,7 @@ signals:
   void loadImage(const QString &imagePath);
   void nextImage(const QPixmap &currentPixmap);
   void previousImage(const QPixmap &currentPixmap);
+  void deleteCurrentImage(const QPixmap &currentPixmap);
 
 private:
   void zoomIn();

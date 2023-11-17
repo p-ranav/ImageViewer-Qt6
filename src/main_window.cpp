@@ -35,6 +35,10 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(this, &MainWindow::nextImage, imageLoader, &ImageLoader::nextImage);
   connect(this, &MainWindow::previousImage, imageLoader,
           &ImageLoader::previousImage);
+  connect(this, &MainWindow::deleteCurrentImage, imageLoader,
+          &ImageLoader::deleteCurrentImage);
+  connect(imageLoader, &ImageLoader::noMoreImagesLeft, this,
+          &MainWindow::onNoMoreImagesLeft);
   connect(imageLoader, &ImageLoader::imageLoaded, this,
           &MainWindow::onImageLoaded);
 
@@ -193,6 +197,15 @@ void MainWindow::onImageLoaded(const QFileInfo &imageFileInfo,
   sidebar->setFileType(documentType);
 }
 
+void MainWindow::onNoMoreImagesLeft() {
+  auto emptyImage = QImage(0, 0, QImage::Format_ARGB32);
+  auto emptyPixmap = QPixmap::fromImage(emptyImage);
+  imageViewer->setPixmap(emptyPixmap, 0, 0);
+  sidebar->setFileName("");
+  sidebar->setFileSize("");
+  sidebar->setFileType("");
+}
+
 bool MainWindow::event(QEvent *event) {
   if (event->type() == QEvent::KeyPress) {
     // Handle the key press event here
@@ -217,6 +230,9 @@ bool MainWindow::event(QEvent *event) {
         sidebarVisible = false;
       }
       return true; // Event handled
+    } else if (key == Qt::Key_D && modifiers == Qt::NoModifier) {
+      // Delete current image
+      emit deleteCurrentImage(imageViewer->pixmap());
     }
   }
 

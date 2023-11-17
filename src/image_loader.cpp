@@ -226,7 +226,9 @@ void ImageLoader::loadImage(const QString &imagePath) {
   }
 }
 
-bool ImageLoader::hasPrevious() const { return (m_currentIndex >= 1); }
+bool ImageLoader::hasPrevious() const {
+  return m_imageFilePaths.size() > 0 && (m_currentIndex >= 1);
+}
 
 void ImageLoader::previousImage(const QPixmap &currentPixmap) {
   if (hasPrevious()) {
@@ -245,7 +247,8 @@ void ImageLoader::previousImage(const QPixmap &currentPixmap) {
 }
 
 bool ImageLoader::hasNext() const {
-  return (m_currentIndex + 1 < m_imageFilePaths.size());
+  return (m_imageFilePaths.size() > 0 &&
+          m_currentIndex + 1 < m_imageFilePaths.size());
 }
 
 void ImageLoader::nextImage(const QPixmap &currentPixmap) {
@@ -275,4 +278,31 @@ QPixmap ImageLoader::getCurrentImageFullRes() {
   loadImageIntoPixmap(QString::fromStdString(imagePath), imagePixmap, false);
 
   return imagePixmap;
+}
+
+void ImageLoader::deleteCurrentImage(const QPixmap &currentPixmap) {
+
+  auto imagePath = m_imageFilePaths[m_currentIndex];
+
+  /// Delete image
+  QFile file(QString::fromStdString(imagePath));
+  file.moveToTrash();
+  m_imageFilePaths.erase(
+      std::remove(m_imageFilePaths.begin(), m_imageFilePaths.end(), imagePath),
+      m_imageFilePaths.end());
+  m_currentIndex -= 1;
+
+  if (hasNext()) {
+    nextImage(currentPixmap);
+  } else if (hasPrevious()) {
+    previousImage(currentPixmap);
+  } else {
+    /// No more images in the imageFilePaths list
+    /// show... nothing?
+    emit noMoreImagesLeft();
+  }
+
+  /// If moved to next before, previousPixmap is now wrong
+  /// If moved to prev before, nextPixmap is now wrong
+  /// TODO: Fix it
 }
