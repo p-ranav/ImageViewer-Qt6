@@ -8,11 +8,16 @@ std::vector<std::string> getImageFiles(const char *directory) {
 
   for (const auto &entry : fs::directory_iterator(directory)) {
     if (entry.is_regular_file()) {
-      // Check if the file has an image extension (you can customize the
-      // extensions)
-      std::string extension = entry.path().extension().string();
-      if (extension == ".jpg" || extension == ".jpeg" || extension == ".png" ||
-          extension == ".NEF") {
+
+      std::string extension = entry.path().extension();
+      std::transform(extension.begin(), extension.end(), extension.begin(),
+                     ::tolower);
+
+      const std::vector<std::string> allowedExtensions = {
+          ".jpg", ".jpeg", ".png", ".nef", ".tiff", ".webp"};
+
+      if (std::find(allowedExtensions.begin(), allowedExtensions.end(),
+                    extension) != allowedExtensions.end()) {
         imageFiles.push_back(entry.path().string());
       }
     }

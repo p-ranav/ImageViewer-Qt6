@@ -2,11 +2,6 @@
 
 MainWindow::MainWindow() : QMainWindow() {
 
-  //   QWidget *mainWidget = new QWidget();
-
-  //   // Create a QVBoxLayout for the main layout
-  //   QVBoxLayout *mainLayout = new QVBoxLayout(this);
-
   // Set a dark color palette
   QPalette darkPalette;
   darkPalette.setColor(QPalette::Window, QColor(53, 53, 53));
@@ -26,15 +21,9 @@ MainWindow::MainWindow() : QMainWindow() {
   // Apply the dark color palette to the application
   setPalette(darkPalette);
 
-  //   // Create a QLabel with a QPixmap as its canvas
-  //   canvasLabel.setAlignment(Qt::AlignCenter);
-
   // Create a fixed-size QPixmap on startup
   QRect primaryScreenGeometry = QApplication::primaryScreen()->geometry();
   setGeometry(primaryScreenGeometry);
-
-  //   // Add the splitter to the main layout
-  //   mainLayout->addWidget(&canvasLabel);
 
   // Create the image loader and move it to a separate thread
   imageLoader = new ImageLoader;
@@ -81,9 +70,8 @@ MainWindow::MainWindow() : QMainWindow() {
 
 void MainWindow::openImage() {
   // Open a file dialog to select an image
-  QString fileFilter =
-      "Images (*.png *.jpg *.jpeg *.jp2 *.bmp *.gif *.heic *.icns *.nef *.pbm "
-      "*.pgm *.ppm *.tiff *.webp *.xbm *.xpm)";
+  QString fileFilter = "Images (*.png *.jpg *.jpeg *.nef "
+                       "*.tiff *.webp)";
 
   QString imagePath = QFileDialog::getOpenFileName(
       this, "Open Image", /*QDir::homePath()*/ "", fileFilter);
