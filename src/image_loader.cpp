@@ -43,8 +43,12 @@ void ImageLoader::loadImagePathsIfEmpty(const char *directory,
   }
 }
 
-void ImageLoader::loadNefRaw(const QString &imagePath, QPixmap &imagePixmap) {
+void ImageLoader::loadNefRaw(const QString &imagePath, QPixmap &imagePixmap,
+                             bool half_size) {
   m_rawProcessor.open_file(imagePath.toLocal8Bit().data());
+
+  m_rawProcessor.imgdata.params.half_size = half_size ? 1 : 0;
+
   m_rawProcessor.unpack();
   m_rawProcessor.dcraw_process();
 
@@ -77,10 +81,10 @@ void ImageLoader::loadWithImageReader(const QString &imagePath,
 }
 
 void ImageLoader::loadImageIntoPixmap(const QString &imagePath,
-                                      QPixmap &imagePixmap) {
+                                      QPixmap &imagePixmap, bool half_size) {
   QFileInfo fileInfo(imagePath);
   if (fileInfo.suffix().toLower() == "nef") {
-    loadNefRaw(imagePath, imagePixmap);
+    loadNefRaw(imagePath, imagePixmap, half_size);
   } else {
     loadWithImageReader(imagePath, imagePixmap);
   }
@@ -98,7 +102,7 @@ void ImageLoader::loadImage(const QString &imagePath) {
 
   loadImagePathsIfEmpty(fileInfo.dir().absolutePath().toLocal8Bit().data(),
                         fileInfo.absoluteFilePath().toLocal8Bit().data());
-  loadImageIntoPixmap(imagePath, imagePixmap);
+  loadImageIntoPixmap(imagePath, imagePixmap, true);
 
   emit imageLoaded(imagePixmap);
 
@@ -106,12 +110,12 @@ void ImageLoader::loadImage(const QString &imagePath) {
   if (m_currentIndex >= 1) {
     loadImageIntoPixmap(
         QString::fromStdString(m_imageFilePaths[m_currentIndex - 1]),
-        m_previousPixmap);
+        m_previousPixmap, true);
   }
   if (m_currentIndex + 1 < m_imageFilePaths.size()) {
     loadImageIntoPixmap(
         QString::fromStdString(m_imageFilePaths[m_currentIndex + 1]),
-        m_nextPixmap);
+        m_nextPixmap, true);
   }
 }
 
@@ -125,7 +129,7 @@ void ImageLoader::previousImage(const QPixmap &currentPixmap) {
     m_currentIndex -= 1;
     loadImageIntoPixmap(
         QString::fromStdString(m_imageFilePaths[m_currentIndex - 1]),
-        m_previousPixmap);
+        m_previousPixmap, true);
   }
 }
 
@@ -139,6 +143,15 @@ void ImageLoader::nextImage(const QPixmap &currentPixmap) {
     m_currentIndex += 1;
     loadImageIntoPixmap(
         QString::fromStdString(m_imageFilePaths[m_currentIndex + 1]),
-        m_nextPixmap);
+        m_nextPixmap, true);
   }
+}
+
+QPixmap ImageLoader::getCurrentImageFullRes() {
+  auto imagePath = m_imageFilePaths[m_currentIndex];
+
+  QPixmap imagePixmap;
+  loadImageIntoPixmap(QString::fromStdString(imagePath), imagePixmap, false);
+
+  return imagePixmap;
 }

@@ -23,12 +23,13 @@ class ImageLoader : public QObject {
   QPixmap m_nextPixmap;
 
   void loadImagePathsIfEmpty(const char* directory, const char* current_file);
-  void loadNefRaw(const QString &imagePath, QPixmap& imagePixmap);
+  void loadNefRaw(const QString &imagePath, QPixmap& imagePixmap, bool half_size);
   void loadWithImageReader(const QString &imagePath, QPixmap& imagePixmap);
-  void loadImageIntoPixmap(const QString &imagePath, QPixmap& imagePixmap);
+  void loadImageIntoPixmap(const QString &imagePath, QPixmap& imagePixmap, bool half_size);
 
 public:
   void resetImageFilePaths();
+  QPixmap getCurrentImageFullRes();
 
 public slots:
   void loadImage(const QString &imagePath);

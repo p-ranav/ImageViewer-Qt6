@@ -112,7 +112,8 @@ void MainWindow::quickExportAsPng() {
   }
 
   // Save the image as a PNG file
-  if (imageViewer->pixmap().save(saveFileName, "PNG")) {
+  auto pixmapFullRes = imageLoader->getCurrentImageFullRes();
+  if (pixmapFullRes.save(saveFileName, "PNG")) {
     qDebug() << "Image saved successfully as" << saveFileName;
   } else {
     qDebug() << "Error saving image";
