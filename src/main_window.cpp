@@ -97,9 +97,14 @@ void MainWindow::openImage() {
 }
 
 void MainWindow::quickExportAsPng() {
+
+  QString currentFilePath = imageLoader->getCurrentImageFilePath();
+  QFileInfo fileInfo(currentFilePath);
+  QString fileName = fileInfo.baseName();
+
   // Get a file name for saving the PNG
-  QString saveFileName = QFileDialog::getSaveFileName(nullptr, "Save PNG File",
-                                                      "", "PNG Files (*.png)");
+  QString saveFileName = QFileDialog::getSaveFileName(
+      nullptr, "Save PNG File", fileName + ".png", "PNG Files (*.png)");
 
   if (saveFileName.isEmpty()) {
     // User canceled the operation or didn't provide a file name

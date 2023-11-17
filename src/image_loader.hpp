@@ -29,6 +29,7 @@ class ImageLoader : public QObject {
 
 public:
   void resetImageFilePaths();
+  QString getCurrentImageFilePath();
   QPixmap getCurrentImageFullRes();
 
 public slots:

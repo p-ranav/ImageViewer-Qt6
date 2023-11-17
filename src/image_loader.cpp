@@ -147,6 +147,10 @@ void ImageLoader::nextImage(const QPixmap &currentPixmap) {
   }
 }
 
+QString ImageLoader::getCurrentImageFilePath() {
+  return QString::fromStdString(m_imageFilePaths[m_currentIndex]);
+}
+
 QPixmap ImageLoader::getCurrentImageFullRes() {
   auto imagePath = m_imageFilePaths[m_currentIndex];
 
