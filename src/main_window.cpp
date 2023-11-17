@@ -73,7 +73,7 @@ MainWindow::MainWindow() : QMainWindow() {
   viewMenu->addAction(zoomOutAction);
 
   // Create a imageViewer to display the image
-  imageViewer = new ImageViewer();
+  imageViewer = new ImageViewer(this);
   connect(imageViewer, &ImageViewer::copyRequested, this,
           &MainWindow::copyToClipboard);
 
@@ -145,10 +145,12 @@ bool MainWindow::event(QEvent *event) {
     Qt::Key key = static_cast<Qt::Key>(keyEvent->key());
     Qt::KeyboardModifiers modifiers = keyEvent->modifiers();
 
-    if (key == Qt::Key_N && modifiers == Qt::NoModifier) {
+    if ((key == Qt::Key_N || key == Qt::Key_Right) &&
+        modifiers == Qt::NoModifier) {
       emit nextImage(imageViewer->pixmap());
       return true; // Event handled
-    } else if (key == Qt::Key_P && modifiers == Qt::NoModifier) {
+    } else if ((key == Qt::Key_P || key == Qt::Key_Left) &&
+               modifiers == Qt::NoModifier) {
       emit previousImage(imageViewer->pixmap());
       return true; // Event handled
     }

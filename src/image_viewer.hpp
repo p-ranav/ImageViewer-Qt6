@@ -10,6 +10,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QClipboard>
+#include <optional>
 
 class ImageViewer : public QGraphicsView {
   Q_OBJECT
@@ -20,8 +21,11 @@ class ImageViewer : public QGraphicsView {
 signals:
     void copyRequested();
 
+private:
+  std::optional<QSize> getMainWindowSize() const;
+
 public:
-  ImageViewer();
+  ImageViewer(QWidget *parent = nullptr);
   void setPixmap(const QPixmap &pixmap, int desiredWidth, int desiredHeight);
   QPixmap pixmap() const;
   void scale(qreal s);
@@ -35,4 +39,5 @@ protected:
   bool nativeGestureEvent(QNativeGestureEvent *event);
   void keyPressEvent(QKeyEvent *event) override;
   void contextMenuEvent(QContextMenuEvent* event) override;
+  void mouseDoubleClickEvent(QMouseEvent *event) override;
 };

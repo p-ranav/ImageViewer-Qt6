@@ -1,6 +1,6 @@
 #include "image_viewer.hpp"
 
-ImageViewer::ImageViewer() {
+ImageViewer::ImageViewer(QWidget *parent) : QGraphicsView(parent) {
   setScene(&m_scene);
   m_scene.addItem(&m_item);
   setDragMode(QGraphicsView::ScrollHandDrag);
@@ -129,4 +129,31 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
   if (selectedItem == copyAction) {
     emit copyRequested();
   }
+}
+
+void ImageViewer::mouseDoubleClickEvent(QMouseEvent *event) {
+  if (event->button() == Qt::LeftButton) {
+    // Handle left mouse button double click
+    QPointF scenePos = mapToScene(event->pos());
+    qDebug() << "Double click at scene coordinates:" << scenePos;
+
+    auto maybeSize = getMainWindowSize();
+    if (maybeSize.has_value()) {
+      auto size = maybeSize.value();
+      auto desiredWidth = size.width() * 0.80;
+      auto desiredHeight = size.height() * 0.95;
+      resize(desiredWidth, desiredHeight);
+    }
+  }
+
+  // Call the base class implementation
+  QGraphicsView::mouseDoubleClickEvent(event);
+}
+
+std::optional<QSize> ImageViewer::getMainWindowSize() const {
+  // Get the QMainWindow size from the QGraphicsView
+  if (QMainWindow *mainWindow = qobject_cast<QMainWindow *>(parentWidget())) {
+    return mainWindow->size();
+  }
+  return std::nullopt;
 }
