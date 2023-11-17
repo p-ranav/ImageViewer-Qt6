@@ -30,7 +30,7 @@ public:
 public slots:
   void openImage();
   void quickExportAsPng();
-
+  void copyToClipboard();
   void onImageLoaded(const QPixmap &imagePixmap);
 
 protected:

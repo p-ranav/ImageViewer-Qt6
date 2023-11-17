@@ -74,6 +74,9 @@ MainWindow::MainWindow() : QMainWindow() {
 
   // Create a imageViewer to display the image
   imageViewer = new ImageViewer();
+  connect(imageViewer, &ImageViewer::copyRequested, this,
+          &MainWindow::copyToClipboard);
+
   setCentralWidget(imageViewer);
 
   openImage();
@@ -122,6 +125,12 @@ void MainWindow::quickExportAsPng() {
   } else {
     qDebug() << "Error saving image";
   }
+}
+
+void MainWindow::copyToClipboard() {
+  const auto pixmapFullRes = imageLoader->getCurrentImageFullRes();
+  QClipboard *clipboard = QGuiApplication::clipboard();
+  clipboard->setPixmap(pixmapFullRes);
 }
 
 void MainWindow::onImageLoaded(const QPixmap &imagePixmap) {
