@@ -9,7 +9,8 @@ ImageViewer::ImageViewer() {
   setResizeAnchor(QGraphicsView::AnchorViewCenter);
 }
 
-void ImageViewer::setPixmap(const QPixmap &pixmap, int desiredHeight) {
+void ImageViewer::setPixmap(const QPixmap &pixmap, int desiredWidth,
+                            int desiredHeight) {
   // Reset transformation before setting the new pixmap
   m_item.resetTransform();
 
@@ -19,8 +20,13 @@ void ImageViewer::setPixmap(const QPixmap &pixmap, int desiredHeight) {
   // Enable smooth transformation by setting interpolation mode
   m_item.setTransformationMode(Qt::SmoothTransformation);
 
-  // Calculate the scale factor to achieve the desired height
-  qreal scaleFactor = static_cast<qreal>(desiredHeight) / pixmap.height();
+  // Calculate the scale factors to achieve the desired width and height while
+  // maintaining aspect ratio
+  qreal scaleFactorWidth = static_cast<qreal>(desiredWidth) / pixmap.width();
+  qreal scaleFactorHeight = static_cast<qreal>(desiredHeight) / pixmap.height();
+  qreal scaleFactor = qMin(scaleFactorWidth, scaleFactorHeight);
+  //   // Calculate the scale factor to achieve the desired height
+  //   qreal scaleFactor = static_cast<qreal>(desiredHeight) / pixmap.height();
 
   // Scale the QGraphicsPixmapItem
   QGraphicsView::resetTransform();
@@ -38,6 +44,23 @@ void ImageViewer::setPixmap(const QPixmap &pixmap, int desiredHeight) {
 QPixmap ImageViewer::pixmap() const { return m_item.pixmap(); }
 
 void ImageViewer::scale(qreal s) { QGraphicsView::scale(s, s); }
+
+void ImageViewer::resize(int desiredWidth, int desiredHeight) {
+  const auto &pixmap = m_item.pixmap();
+  qreal scaleFactorWidth = static_cast<qreal>(desiredWidth) / pixmap.width();
+  qreal scaleFactorHeight = static_cast<qreal>(desiredHeight) / pixmap.height();
+  qreal scaleFactor = qMin(scaleFactorWidth, scaleFactorHeight);
+  QGraphicsView::resetTransform();
+  scale(scaleFactor);
+
+  // Center the QGraphicsPixmapItem in the window
+  auto offset = -QRectF(pixmap.rect()).center();
+  m_item.setOffset(offset);
+
+  // Set the scene rect
+  m_scene.setSceneRect(-pixmap.width() / 2.0, -pixmap.height() / 2.0,
+                       pixmap.width(), pixmap.height());
+}
 
 void ImageViewer::zoomIn() { scale(1.2); }
 

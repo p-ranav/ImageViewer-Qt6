@@ -135,7 +135,7 @@ void MainWindow::copyToClipboard() {
 
 void MainWindow::onImageLoaded(const QPixmap &imagePixmap) {
   // Set the resized image to the QLabel
-  imageViewer->setPixmap(imagePixmap, height() * 0.95);
+  imageViewer->setPixmap(imagePixmap, width() * 0.80, height() * 0.95);
 }
 
 bool MainWindow::event(QEvent *event) {
@@ -163,6 +163,14 @@ void MainWindow::closeEvent(QCloseEvent *event) {
   imageLoaderThread->quit();
   imageLoaderThread->wait();
   event->accept();
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event) {
+  auto desiredWidth = width() * 0.80;
+  auto desiredHeight = height() * 0.95;
+  imageViewer->resize(desiredWidth, desiredHeight);
+
+  QMainWindow::resizeEvent(event);
 }
 
 void MainWindow::zoomIn() { imageViewer->zoomIn(); }

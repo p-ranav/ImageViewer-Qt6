@@ -22,9 +22,10 @@ signals:
 
 public:
   ImageViewer();
-  void setPixmap(const QPixmap &pixmap, int desiredHeight);
+  void setPixmap(const QPixmap &pixmap, int desiredWidth, int desiredHeight);
   QPixmap pixmap() const;
   void scale(qreal s);
+  void resize(int desiredWidth, int desiredHeight);
   void zoomIn();
   void zoomOut();
 
