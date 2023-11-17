@@ -139,12 +139,38 @@ void MainWindow::copyToClipboard() {
   clipboard->setPixmap(pixmapFullRes);
 }
 
+QString prettyPrintSize(qint64 size) {
+  const qint64 kb = 1024;
+  const qint64 mb = kb * 1024;
+  const qint64 gb = mb * 1024;
+
+  if (size < kb) {
+    return QString("%1 bytes").arg(size);
+  } else if (size < mb) {
+    return QString("%1 KB (%2 bytes)")
+        .arg(size / kb)
+        .arg(QLocale().toString(size));
+  } else if (size < gb) {
+    return QString("%1 MB (%2 bytes)")
+        .arg(size / mb)
+        .arg(QLocale().toString(size));
+  } else {
+    return QString("%1 GB (%2 bytes)")
+        .arg(size / gb)
+        .arg(QLocale().toString(size));
+  }
+}
+
 void MainWindow::onImageLoaded(const QFileInfo &imageFileInfo,
                                const QPixmap &imagePixmap) {
   // Set the resized image to the QLabel
   imageViewer->setPixmap(imagePixmap, width() * 0.80, height() * 0.95);
 
   sidebar->setFileName(imageFileInfo.fileName());
+
+  qint64 fileSize = imageFileInfo.size();
+  QString prettySize = prettyPrintSize(fileSize);
+  sidebar->setFileSize(prettySize);
 }
 
 bool MainWindow::event(QEvent *event) {
