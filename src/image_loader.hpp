@@ -38,5 +38,5 @@ public slots:
   void previousImage(const QPixmap &currentPixmap);
 
 signals:
-  void imageLoaded(const QPixmap &imagePixmap);
+  void imageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap);
 };

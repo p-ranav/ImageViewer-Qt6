@@ -79,6 +79,9 @@ MainWindow::MainWindow() : QMainWindow() {
 
   setCentralWidget(imageViewer);
 
+  sidebar = new VerticalSidebar(this);
+  sidebar->hide();
+
   openImage();
 }
 
@@ -95,6 +98,9 @@ void MainWindow::openImage() {
 
     imageLoader->resetImageFilePaths();
     emit loadImage(imagePath);
+
+    QFileInfo fileInfo(imagePath);
+    sidebar->setFileName(fileInfo.fileName());
   }
 }
 
@@ -133,9 +139,12 @@ void MainWindow::copyToClipboard() {
   clipboard->setPixmap(pixmapFullRes);
 }
 
-void MainWindow::onImageLoaded(const QPixmap &imagePixmap) {
+void MainWindow::onImageLoaded(const QFileInfo &imageFileInfo,
+                               const QPixmap &imagePixmap) {
   // Set the resized image to the QLabel
   imageViewer->setPixmap(imagePixmap, width() * 0.80, height() * 0.95);
+
+  sidebar->setFileName(imageFileInfo.fileName());
 }
 
 bool MainWindow::event(QEvent *event) {
@@ -152,6 +161,15 @@ bool MainWindow::event(QEvent *event) {
     } else if ((key == Qt::Key_P || key == Qt::Key_Left) &&
                modifiers == Qt::NoModifier) {
       emit previousImage(imageViewer->pixmap());
+      return true; // Event handled
+    } else if (key == Qt::Key_I && modifiers == Qt::NoModifier) {
+      if (!sidebarVisible) {
+        sidebar->show();
+        sidebarVisible = true;
+      } else {
+        sidebar->hide();
+        sidebarVisible = false;
+      }
       return true; // Event handled
     }
   }

@@ -19,6 +19,7 @@
 #include "image_viewer.hpp"
 #include <chrono>
 #include <iostream>
+#include "vertical_sidebar.hpp"
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -31,7 +32,7 @@ public slots:
   void openImage();
   void quickExportAsPng();
   void copyToClipboard();
-  void onImageLoaded(const QPixmap &imagePixmap);
+  void onImageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap);
 
 protected:
   bool event(QEvent* event) override;
@@ -53,5 +54,7 @@ private:
   ImageLoader *imageLoader;
   QThread *imageLoaderThread;
 
+  bool sidebarVisible{false};
+  VerticalSidebar* sidebar;
   ImageViewer *imageViewer;
 };

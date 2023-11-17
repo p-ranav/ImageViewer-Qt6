@@ -109,7 +109,7 @@ void ImageLoader::loadImage(const QString &imagePath) {
                         fileInfo.absoluteFilePath().toLocal8Bit().data());
   loadImageIntoPixmap(imagePath, imagePixmap, true);
 
-  emit imageLoaded(imagePixmap);
+  emit imageLoaded(fileInfo, imagePixmap);
 
   // Prefetch next and previous images
   if (m_currentIndex >= 1) {
@@ -127,7 +127,9 @@ void ImageLoader::loadImage(const QString &imagePath) {
 void ImageLoader::previousImage(const QPixmap &currentPixmap) {
   if (m_currentIndex >= 1) {
 
-    emit imageLoaded(m_previousPixmap);
+    QFileInfo fileInfo(
+        QString::fromStdString(m_imageFilePaths[m_currentIndex - 1]));
+    emit imageLoaded(fileInfo, m_previousPixmap);
 
     m_nextPixmap = currentPixmap;
 
@@ -141,7 +143,9 @@ void ImageLoader::previousImage(const QPixmap &currentPixmap) {
 void ImageLoader::nextImage(const QPixmap &currentPixmap) {
   if (m_currentIndex + 1 < m_imageFilePaths.size()) {
 
-    emit imageLoaded(m_nextPixmap);
+    QFileInfo fileInfo(
+        QString::fromStdString(m_imageFilePaths[m_currentIndex + 1]));
+    emit imageLoaded(fileInfo, m_nextPixmap);
 
     m_previousPixmap = currentPixmap;
 
