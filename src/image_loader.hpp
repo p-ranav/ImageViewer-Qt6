@@ -11,6 +11,7 @@
 #include <vector>
 #include <string>
 #include <QDir>
+#include <libexif/exif-data.h>
 
 class ImageLoader : public QObject {
   Q_OBJECT
@@ -23,11 +24,12 @@ class ImageLoader : public QObject {
   QPixmap m_nextPixmap;
 
   void loadImagePathsIfEmpty(const char* directory, const char* current_file);
-  void loadNefRaw(const QString &imagePath, QPixmap& imagePixmap, bool half_size);
+  void loadRaw(const QString &imagePath, QPixmap& imagePixmap, bool half_size);
   void loadWithImageReader(const QString &imagePath, QPixmap& imagePixmap);
   void loadImageIntoPixmap(const QString &imagePath, QPixmap& imagePixmap, bool half_size);
 
 public:
+  ImageLoader();
   void resetImageFilePaths();
   QString getCurrentImageFilePath();
   QPixmap getCurrentImageFullRes();

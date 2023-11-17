@@ -2,7 +2,7 @@
 brew install libraw qt@6
 mkdir build
 cd build
-cmake -DCMAKE_BUILD_TYPE=Release -DQt6_DIR=$(brew --prefix qt6)/lib/cmake/Qt6 -DLibRaw_INCLUDE_DIRS=$(brew --prefix libraw)/include -DLibRaw_LIBRARIES=$(brew --prefix libraw)/lib/libraw.dylib ..
+cmake -DCMAKE_BUILD_TYPE=Release -DQt6_DIR=$(brew --prefix qt6)/lib/cmake/Qt6 -DLibRaw_INCLUDE_DIRS=$(brew --prefix libraw)/include -DLibRaw_LIBRARIES=$(brew --prefix libraw)/lib/libraw.dylib -DLibExif_INCLUDE_DIRS=$(brew --prefix libexif)/include -DLibExif_LIBRARIES=$(brew --prefix libexif)/lib/libexif.dylib ..
 make
 ```
 
