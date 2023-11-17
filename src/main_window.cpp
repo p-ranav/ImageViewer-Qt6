@@ -43,6 +43,9 @@ MainWindow::MainWindow() : QMainWindow() {
 
   // Connect signals and slots for image loading
   connect(this, &MainWindow::loadImage, imageLoader, &ImageLoader::loadImage);
+  connect(this, &MainWindow::nextImage, imageLoader, &ImageLoader::nextImage);
+  connect(this, &MainWindow::previousImage, imageLoader,
+          &ImageLoader::previousImage);
   connect(imageLoader, &ImageLoader::imageLoaded, this,
           &MainWindow::onImageLoaded);
 
@@ -88,7 +91,6 @@ void MainWindow::openImage() {
   if (!imagePath.isEmpty()) {
     // Emit a signal to load the image in a separate thread
 
-    load_start_time = std::chrono::high_resolution_clock::now();
     emit loadImage(imagePath);
   }
 }
@@ -119,11 +121,26 @@ void MainWindow::quickExportAsPng() {
 void MainWindow::onImageLoaded(const QPixmap &imagePixmap) {
   // Set the resized image to the QLabel
   imageViewer->setPixmap(imagePixmap, height() * 0.95);
-  load_end_time = std::chrono::high_resolution_clock::now();
-  std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(
-                   load_end_time - load_start_time)
-                   .count()
-            << "ms\n";
+}
+
+bool MainWindow::event(QEvent *event) {
+  if (event->type() == QEvent::KeyPress) {
+    // Handle the key press event here
+    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+    Qt::Key key = static_cast<Qt::Key>(keyEvent->key());
+    Qt::KeyboardModifiers modifiers = keyEvent->modifiers();
+
+    if (key == Qt::Key_N && modifiers == Qt::NoModifier) {
+      emit nextImage(imageViewer->pixmap());
+      return true; // Event handled
+    } else if (key == Qt::Key_P && modifiers == Qt::NoModifier) {
+      emit previousImage(imageViewer->pixmap());
+      return true; // Event handled
+    }
+  }
+
+  // Call the base class implementation for other events
+  return QMainWindow::event(event);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {

@@ -35,8 +35,6 @@ public:
     // Calculate the scale factor to achieve the desired height
     qreal scaleFactor = static_cast<qreal>(desiredHeight) / pixmap.height();
 
-    std::cout << desiredHeight << " vs " << pixmap.height() << std::endl;
-
     // Scale the QGraphicsPixmapItem
     QGraphicsView::resetTransform();
     scale(scaleFactor);

@@ -34,10 +34,13 @@ public slots:
   void onImageLoaded(const QPixmap &imagePixmap);
 
 protected:
+  bool event(QEvent* event) override;
   void closeEvent(QCloseEvent *event) override;
 
 signals:
   void loadImage(const QString &imagePath);
+  void nextImage(const QPixmap &currentPixmap);
+  void previousImage(const QPixmap &currentPixmap);
 
 private:
   QLabel canvasLabel;
@@ -46,6 +49,4 @@ private:
   QThread *imageLoaderThread;
 
   ImageViewer *imageViewer;
-  std::chrono::time_point<std::chrono::high_resolution_clock> load_start_time;
-  std::chrono::time_point<std::chrono::high_resolution_clock> load_end_time;
 };
