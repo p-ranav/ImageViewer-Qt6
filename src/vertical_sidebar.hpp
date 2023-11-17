@@ -16,24 +16,23 @@ public:
         mainLayout->setContentsMargins(20, 20, 20, 20); // Set margins on all sides
 
         QFormLayout *layout = new QFormLayout();
+        layout->setLabelAlignment(Qt::AlignLeft);
+        layout->setFormAlignment(Qt::AlignLeft);
 		layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow); // Align fields to the left
         mainLayout->addLayout(layout);
 
         // File Name
-        QLabel *fileNameLabel = new QLabel("File name: ");
-		fileNameLabel->setAlignment(Qt::AlignLeft);
+        QLabel *fileNameLabel = new QLabel("File name ");
         fileNameValue = new QLabel(""); // Default value
         layout->addRow(fileNameLabel, fileNameValue);
 
         // File Size
-        QLabel *fileSizeLabel = new QLabel("File size: ");
-		fileSizeLabel->setAlignment(Qt::AlignLeft);
+        QLabel *fileSizeLabel = new QLabel("File size ");
         fileSizeValue = new QLabel(""); // Default value
         layout->addRow(fileSizeLabel, fileSizeValue);
 
         // File Type
-        QLabel *fileTypeLabel = new QLabel("Document type: ");
-		fileTypeLabel->setAlignment(Qt::AlignLeft);
+        QLabel *fileTypeLabel = new QLabel("Document type ");
         fileTypeValue = new QLabel(""); // Default value
         layout->addRow(fileTypeLabel, fileTypeValue);
 
