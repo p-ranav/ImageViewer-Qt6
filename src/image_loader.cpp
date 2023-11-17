@@ -226,8 +226,10 @@ void ImageLoader::loadImage(const QString &imagePath) {
   }
 }
 
+bool ImageLoader::hasPrevious() const { return (m_currentIndex >= 1); }
+
 void ImageLoader::previousImage(const QPixmap &currentPixmap) {
-  if (m_currentIndex >= 1) {
+  if (hasPrevious()) {
 
     QFileInfo fileInfo(
         QString::fromStdString(m_imageFilePaths[m_currentIndex - 1]));
@@ -242,8 +244,12 @@ void ImageLoader::previousImage(const QPixmap &currentPixmap) {
   }
 }
 
+bool ImageLoader::hasNext() const {
+  return (m_currentIndex + 1 < m_imageFilePaths.size());
+}
+
 void ImageLoader::nextImage(const QPixmap &currentPixmap) {
-  if (m_currentIndex + 1 < m_imageFilePaths.size()) {
+  if (hasNext()) {
 
     QFileInfo fileInfo(
         QString::fromStdString(m_imageFilePaths[m_currentIndex + 1]));

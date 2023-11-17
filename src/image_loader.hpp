@@ -36,7 +36,11 @@ public:
 
 public slots:
   void loadImage(const QString &imagePath);
+  
+  bool hasNext() const;
   void nextImage(const QPixmap &currentPixmap);
+  
+  bool hasPrevious() const;
   void previousImage(const QPixmap &currentPixmap);
 
 signals:
