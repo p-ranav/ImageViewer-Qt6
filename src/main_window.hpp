@@ -43,6 +43,10 @@ signals:
   void previousImage(const QPixmap &currentPixmap);
 
 private:
+  void zoomIn();
+  void zoomOut();
+
+private:
   QLabel canvasLabel;
 
   ImageLoader *imageLoader;

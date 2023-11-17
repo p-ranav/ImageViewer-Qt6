@@ -47,6 +47,7 @@ MainWindow::MainWindow() : QMainWindow() {
 
   // Create a "File" menu
   QMenu *fileMenu = menuBar->addMenu("File");
+  QMenu *viewMenu = menuBar->addMenu("View");
 
   // Create an "Open" action
   QAction *openAction = new QAction("Open...", this);
@@ -57,9 +58,19 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(quickExportAction, &QAction::triggered, this,
           &MainWindow::quickExportAsPng);
 
+  // Create an "Zoom In" action
+  QAction *zoomInAction = new QAction("Zoom In", this);
+  connect(zoomInAction, &QAction::triggered, this, &MainWindow::zoomIn);
+
+  // Create an "Zoom Out" action
+  QAction *zoomOutAction = new QAction("Zoom Out", this);
+  connect(zoomOutAction, &QAction::triggered, this, &MainWindow::zoomOut);
+
   // Add the "Open" action to the "File" menu
   fileMenu->addAction(openAction);
   fileMenu->addAction(quickExportAction);
+  viewMenu->addAction(zoomInAction);
+  viewMenu->addAction(zoomOutAction);
 
   // Create a imageViewer to display the image
   imageViewer = new ImageViewer();
@@ -144,3 +155,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
   imageLoaderThread->wait();
   event->accept();
 }
+
+void MainWindow::zoomIn() { imageViewer->zoomIn(); }
+
+void MainWindow::zoomOut() { imageViewer->zoomOut(); }

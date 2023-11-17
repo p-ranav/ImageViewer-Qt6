@@ -52,6 +52,14 @@ public:
 
   void scale(qreal s) { QGraphicsView::scale(s, s); }
 
+  void zoomIn() {
+    scale(1.2);
+  }
+
+  void zoomOut() {
+    scale(0.8);
+  }
+
 protected:
   bool event(QEvent *event) override {
     if (event->type() == QEvent::NativeGesture) {
