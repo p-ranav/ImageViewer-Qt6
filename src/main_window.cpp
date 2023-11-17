@@ -161,6 +161,23 @@ QString prettyPrintSize(qint64 size) {
   }
 }
 
+QString getDocumentType(const QFileInfo &fileInfo) {
+  QString extension = fileInfo.suffix().toLower();
+
+  if (extension.isEmpty()) {
+    return "Unknown Type";
+  } else if (extension == "png" || extension == "jpg" || extension == "jpeg" ||
+             extension == "gif") {
+    return "Image File";
+  } else if (extension == "webp") {
+    return "WebP Image";
+  } else if (extension == "nef") {
+    return "Nikon RAW Image";
+  } else {
+    return "Unknown Type";
+  }
+}
+
 void MainWindow::onImageLoaded(const QFileInfo &imageFileInfo,
                                const QPixmap &imagePixmap) {
   // Set the resized image to the QLabel
@@ -171,6 +188,9 @@ void MainWindow::onImageLoaded(const QFileInfo &imageFileInfo,
   qint64 fileSize = imageFileInfo.size();
   QString prettySize = prettyPrintSize(fileSize);
   sidebar->setFileSize(prettySize);
+
+  const auto documentType = getDocumentType(imageFileInfo);
+  sidebar->setFileType(documentType);
 }
 
 bool MainWindow::event(QEvent *event) {
