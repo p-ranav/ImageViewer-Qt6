@@ -1,5 +1,18 @@
 #include "main_window.hpp"
 
+// Function to create a new QIcon with a specified color
+QIcon createColorIcon(const QString &imagePath, const QColor &color, int size) {
+  QPixmap pixmap(imagePath);
+  pixmap =
+      pixmap.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+  QPainter painter(&pixmap);
+  painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+  painter.fillRect(pixmap.rect(), color);
+
+  return QIcon(pixmap);
+}
+
 MainWindow::MainWindow() : QMainWindow() {
 
   // Set a dark color palette
@@ -83,7 +96,43 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(imageViewer, &ImageViewer::deleteRequested, this,
           &MainWindow::deleteCurrentImage);
 
-  setCentralWidget(imageViewer);
+  auto centralWidget = new QWidget(this);
+  auto vstackLayout = new QVBoxLayout();
+  vstackLayout->addWidget(imageViewer);
+  centralWidget->setLayout(vstackLayout);
+
+  auto toolbarWidget = new QWidget(this);
+  // Create two buttons
+  QPushButton *button1 = new QPushButton(this);
+  button1->setFixedSize(40, 40);
+  connect(button1, &QPushButton::pressed,
+          [this]() { emit previousImage(imageViewer->pixmap()); });
+
+  QPushButton *button2 = new QPushButton(this);
+  button2->setFixedSize(40, 40);
+  connect(button2, &QPushButton::pressed,
+          [this]() { emit nextImage(imageViewer->pixmap()); });
+
+  // Create a layout and add buttons to it
+  QHBoxLayout *buttonLayout = new QHBoxLayout();
+  buttonLayout->addWidget(button1);
+  buttonLayout->addWidget(button2);
+  toolbarWidget->setLayout(buttonLayout);
+  toolbarWidget->setFixedWidth(100);
+
+  vstackLayout->addWidget(toolbarWidget, 0, Qt::AlignCenter);
+
+  // Set the icon with a specific color
+  QColor iconColor(Qt::white); // Set your desired color
+  button1->setIcon(createColorIcon(":/images/left_arrow.png", iconColor, 24));
+  button2->setIcon(createColorIcon(":/images/right_arrow.png", iconColor, 24));
+
+  button1->setStyleSheet("border: none;");
+  button2->setStyleSheet("border: none;");
+  imageViewer->setStyleSheet("border: none;");
+  centralWidget->setStyleSheet("background-color: rgb(25, 25, 25);");
+
+  setCentralWidget(centralWidget);
 
   sidebar = new VerticalSidebar(this);
   sidebar->hide();
