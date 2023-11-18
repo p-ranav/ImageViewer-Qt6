@@ -247,12 +247,8 @@ void ImageLoader::deleteCurrentImage() {
     emit imageLoaded(fileInfo, m_nextPixmap, m_nextImageWidth,
                      m_nextImageHeight);
 
-    // Prefetch load a new image into previousPixmap
-    if (m_currentIndex - 1 > 0) {
-      loadImageIntoPixmap(
-          QString::fromStdString(m_imageFilePaths[m_currentIndex - 1]),
-          m_previousPixmap, true, m_previousImageWidth, m_previousImageHeight);
-    }
+    m_currentImageWidth = m_nextImageWidth;
+    m_currentImageHeight = m_nextImageHeight;
 
     if (m_currentIndex + 1 < m_imageFilePaths.size()) {
       // Prefetch load a new image into nextPixmap
@@ -273,9 +269,12 @@ void ImageLoader::deleteCurrentImage() {
     QFileInfo fileInfo(
         QString::fromStdString(m_imageFilePaths[m_currentIndex]));
 
-    // Emit nextPixmap as current pixmap
+    // Emit previousPixmap as current pixmap
     emit imageLoaded(fileInfo, m_previousPixmap, m_previousImageWidth,
                      m_previousImageHeight);
+
+    m_currentImageWidth = m_previousImageWidth;
+    m_currentImageHeight = m_previousImageHeight;
 
     // Prefetch load a new image into previousPixmap
     loadImageIntoPixmap(
