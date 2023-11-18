@@ -45,6 +45,7 @@ public:
   QPixmap getCurrentImageFullRes();
   bool hasNext() const;
   bool hasPrevious() const;
+  QString getHeaderLabel() const;
 
 public slots:
   void loadImage(const QString &imagePath);

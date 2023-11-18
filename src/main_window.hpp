@@ -57,6 +57,7 @@ private:
 
 private:
   QLabel canvasLabel;
+  QLabel *m_headerLabel;
 
   ImageLoader *imageLoader;
   QThread *imageLoaderThread;

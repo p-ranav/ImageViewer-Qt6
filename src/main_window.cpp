@@ -78,6 +78,9 @@ MainWindow::MainWindow() : QMainWindow() {
   viewMenu->addAction(zoomInAction);
   viewMenu->addAction(zoomOutAction);
 
+  m_headerLabel = new QLabel("", this);
+  m_headerLabel->setStyleSheet("QLabel { margin-top: 10px; }");
+
   // Create a imageViewer to display the image
   imageViewer = new ImageViewer(this);
   connect(imageViewer, &ImageViewer::copyRequested, this,
@@ -90,6 +93,7 @@ MainWindow::MainWindow() : QMainWindow() {
 
   auto centralWidget = new QWidget(this);
   auto vstackLayout = new QVBoxLayout();
+  vstackLayout->addWidget(m_headerLabel, 0, Qt::AlignCenter);
   vstackLayout->addWidget(imageViewer);
   centralWidget->setLayout(vstackLayout);
 
@@ -282,6 +286,8 @@ void MainWindow::onImageLoaded(const QFileInfo &imageFileInfo,
                                int imageHeight) {
   // Set the resized image to the QLabel
   imageViewer->setPixmap(imagePixmap, width() * 0.80, height() * 0.80);
+
+  m_headerLabel->setText(imageLoader->getHeaderLabel());
 
   m_infoSidebar->setFileName(imageFileInfo.fileName());
 
