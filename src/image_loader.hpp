@@ -44,7 +44,7 @@ public slots:
   bool hasPrevious() const;
   void previousImage(const QPixmap &currentPixmap);
 
-  void deleteCurrentImage(const QPixmap &currentPixmap);
+  void deleteCurrentImage();
 
 signals:
   void imageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap);

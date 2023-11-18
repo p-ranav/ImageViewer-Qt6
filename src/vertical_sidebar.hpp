@@ -56,7 +56,7 @@ public:
 	}
 
 protected:
-    void paintEvent(QPaintEvent *event) override {
+    void paintEvent(QPaintEvent *) override {
         QPainter painter(this);
         painter.fillRect(rect(), QColor(0, 0, 0, 150)); // Set the background color and alpha
     }

@@ -44,7 +44,7 @@ signals:
   void loadImage(const QString &imagePath);
   void nextImage(const QPixmap &currentPixmap);
   void previousImage(const QPixmap &currentPixmap);
-  void deleteCurrentImage(const QPixmap &currentPixmap);
+  void deleteCurrentImage();
 
 private:
   void zoomIn();

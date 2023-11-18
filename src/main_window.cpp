@@ -232,7 +232,7 @@ bool MainWindow::event(QEvent *event) {
       return true; // Event handled
     } else if (key == Qt::Key_D && modifiers == Qt::NoModifier) {
       // Delete current image
-      emit deleteCurrentImage(imageViewer->pixmap());
+      emit deleteCurrentImage();
     }
   }
 

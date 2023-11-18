@@ -3,58 +3,6 @@
 #include <iostream>
 namespace fs = std::filesystem;
 
-static unsigned entry_count{0};
-void *callback_data = NULL;
-
-/** Callback function handling an ExifEntry. */
-static void content_foreach_func(ExifEntry *entry, void *callback_data) {
-  char buf[2000];
-  exif_entry_get_value(entry, buf, sizeof(buf));
-  printf("    Entry %u: %s (%s)\n"
-         "      Size, Comps: %d, %d\n"
-         "      Value: %s\n",
-         entry_count, exif_tag_get_name(entry->tag),
-         exif_format_get_name(entry->format), entry->size,
-         (int)(entry->components),
-         exif_entry_get_value(entry, buf, sizeof(buf)));
-  ++entry_count;
-}
-
-/** Callback function handling an ExifContent (corresponds 1:1 to an IFD). */
-static void data_foreach_func(ExifContent *content, void *callback_data) {
-  static unsigned content_count;
-  entry_count = 0;
-  printf("  Content %u: ifd=%d\n", content_count,
-         exif_content_get_ifd(content));
-  exif_content_foreach_entry(content, content_foreach_func, callback_data);
-  ++content_count;
-}
-
-void readExifData(const char *filePath) {
-  ExifData *d;
-  unsigned char *buf;
-  unsigned int len;
-
-  const char *fn = filePath;
-  std::cout << "File path: " << fn << "\n";
-  d = exif_data_new_from_file(fn);
-  if (!d) {
-    fprintf(stderr, "Could not load data from '%s'!\n", fn);
-    return;
-  }
-
-  exif_data_save_data(d, &buf, &len);
-
-  if (!buf) {
-    fprintf(stderr, "Could not extract EXIF data!\n");
-    return;
-  }
-
-  exif_data_foreach_content(d, data_foreach_func, callback_data);
-
-  exif_data_unref(d);
-}
-
 std::vector<std::string> getImageFiles(const char *directory) {
   std::vector<std::string> imageFiles;
 
@@ -80,41 +28,7 @@ std::vector<std::string> getImageFiles(const char *directory) {
   return imageFiles;
 }
 
-// void my_exif_parser_callback (void *context, int tag, int type, int len,
-// unsigned int ord, void *ifp, long long)
-// {
-//   // // context - pointer to context passed to set_exifparser_handler();
-//   // // tag - EXIF/Makernotes tag value
-//   // // type - TIFF(EXIF) tag type
-//   // // len - tag length
-//   // // ord - byte order (II or MM)
-//   // // void *ifp - pointer to LibRaw_abstract_datastream, positioned to tag
-//   data
-
-//     // std::cout << "Tag: " << tag << std::endl;
-//     // std::cout << "Type: " << type << std::endl;
-//     // std::cout << "Length: " << len << std::endl;
-//     // std::cout << "Byte Order: " << (ord == 0x4949 ? "Little-endian" :
-//     "Big-endian") << std::endl;
-
-//   //   // Print the tag data (assuming it's a string)
-//   //   char buffer[1024];
-//   //   if (len < sizeof(buffer)) {
-//   //       if (ifp) {
-//   //         libraw_internal_data_t *stream =
-//   static_cast<libraw_internal_data_t *>(ifp);
-//   //           stream->read(buffer, len, 1);
-//   //           buffer[len] = '\0'; // Null-terminate for printing as a string
-//   //           std::cout << "Data: " << buffer << std::endl;
-//   //       }
-//   //   }
-//   //   std::cout << "--------------------------------" << std::endl;
-// }
-
 ImageLoader::ImageLoader() : QObject() {
-  // Register exif callback on m_rawProcessor
-  // m_rawProcessor.set_exifparser_handler(my_exif_parser_callback, nullptr);
-
   // m_rawProcessor.imgdata.params.use_auto_wb = 1;
 }
 
@@ -203,10 +117,6 @@ void ImageLoader::loadImage(const QString &imagePath) {
   QFileInfo fileInfo(imagePath);
   QPixmap imagePixmap;
 
-  // std::cout << "Uhhh.. " << imagePath.toStdString() << " "
-  //           << fileInfo.filePath().toUtf8().constData() << "\n";
-  // readExifData(fileInfo.filePath().toUtf8().constData());
-
   loadImagePathsIfEmpty(fileInfo.dir().absolutePath().toLocal8Bit().data(),
                         fileInfo.absoluteFilePath().toLocal8Bit().data());
   loadImageIntoPixmap(imagePath, imagePixmap, true);
@@ -280,29 +190,73 @@ QPixmap ImageLoader::getCurrentImageFullRes() {
   return imagePixmap;
 }
 
-void ImageLoader::deleteCurrentImage(const QPixmap &currentPixmap) {
+void ImageLoader::deleteCurrentImage() {
 
   auto imagePath = m_imageFilePaths[m_currentIndex];
 
-  /// Delete image
+  // Delete image 
   QFile file(QString::fromStdString(imagePath));
   file.moveToTrash();
+
+  // Delete path from tracked list of paths
   m_imageFilePaths.erase(
       std::remove(m_imageFilePaths.begin(), m_imageFilePaths.end(), imagePath),
       m_imageFilePaths.end());
-  m_currentIndex -= 1;
 
-  if (hasNext()) {
-    nextImage(currentPixmap);
-  } else if (hasPrevious()) {
-    previousImage(currentPixmap);
+  // if possible, move to next image
+  if (m_imageFilePaths.size() > 0 &&
+      m_currentIndex <= m_imageFilePaths.size() - 1) {
+
+    /// more images available
+    /// currentIndex now points to the "next" image that
+    /// should be shown
+    /// no change needed to index
+
+    /// This new image is what used to be nextPixmap
+    /// So just emit that and update newPixmap
+    /// previousPixmap remains the same
+
+    QFileInfo fileInfo(
+        QString::fromStdString(m_imageFilePaths[m_currentIndex]));
+
+    // Emit nextPixmap as current pixmap
+    emit imageLoaded(fileInfo, m_nextPixmap);
+
+    // Prefetch load a new image into previousPixmap
+    if (m_currentIndex - 1 > 0) {
+      loadImageIntoPixmap(
+          QString::fromStdString(m_imageFilePaths[m_currentIndex - 1]),
+          m_previousPixmap, true);
+    }
+
+    if (m_currentIndex + 1 < m_imageFilePaths.size()) {
+      // Prefetch load a new image into nextPixmap
+      loadImageIntoPixmap(
+          QString::fromStdString(m_imageFilePaths[m_currentIndex + 1]),
+          m_nextPixmap, true);
+    }
+  } else if (m_imageFilePaths.size() > 0) {
+    /// Previous condition was not true
+
+    /// At least one more image available in m_imageFilePaths
+    /// We were at the last image in the list
+
+    /// Set the previous pixmap as the new current
+
+    m_currentIndex -= 1;
+
+    QFileInfo fileInfo(
+        QString::fromStdString(m_imageFilePaths[m_currentIndex]));
+
+    // Emit nextPixmap as current pixmap
+    emit imageLoaded(fileInfo, m_previousPixmap);
+
+    // Prefetch load a new image into previousPixmap
+    loadImageIntoPixmap(
+        QString::fromStdString(m_imageFilePaths[m_currentIndex - 1]),
+        m_previousPixmap, true);
+
   } else {
-    /// No more images in the imageFilePaths list
-    /// show... nothing?
     emit noMoreImagesLeft();
   }
-
-  /// If moved to next before, previousPixmap is now wrong
-  /// If moved to prev before, nextPixmap is now wrong
-  /// TODO: Fix it
 }
