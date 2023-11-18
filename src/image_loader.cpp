@@ -166,8 +166,6 @@ void ImageLoader::previousImage(const QPixmap &currentPixmap) {
 
     QFileInfo fileInfo(
         QString::fromStdString(m_imageFilePaths[m_currentIndex - 1]));
-    emit imageLoaded(fileInfo, m_previousPixmap, m_previousImageWidth,
-                     m_previousImageHeight);
 
     m_nextPixmap = currentPixmap;
     m_nextImageWidth = m_currentImageWidth;
@@ -177,6 +175,10 @@ void ImageLoader::previousImage(const QPixmap &currentPixmap) {
     m_currentImageHeight = m_previousImageHeight;
 
     m_currentIndex -= 1;
+
+    emit imageLoaded(fileInfo, m_previousPixmap, m_previousImageWidth,
+                     m_previousImageHeight);
+
     loadImageIntoPixmap(
         QString::fromStdString(m_imageFilePaths[m_currentIndex - 1]),
         m_previousPixmap, true, m_previousImageWidth, m_previousImageHeight);
@@ -193,8 +195,6 @@ void ImageLoader::nextImage(const QPixmap &currentPixmap) {
 
     QFileInfo fileInfo(
         QString::fromStdString(m_imageFilePaths[m_currentIndex + 1]));
-    emit imageLoaded(fileInfo, m_nextPixmap, m_nextImageWidth,
-                     m_nextImageHeight);
 
     m_previousPixmap = currentPixmap;
     m_previousImageWidth = m_currentImageWidth;
@@ -204,6 +204,10 @@ void ImageLoader::nextImage(const QPixmap &currentPixmap) {
     m_currentImageHeight = m_nextImageHeight;
 
     m_currentIndex += 1;
+
+    emit imageLoaded(fileInfo, m_nextPixmap, m_nextImageWidth,
+                     m_nextImageHeight);
+
     if (m_currentIndex + 1 < m_imageFilePaths.size()) {
       loadImageIntoPixmap(
           QString::fromStdString(m_imageFilePaths[m_currentIndex + 1]),
