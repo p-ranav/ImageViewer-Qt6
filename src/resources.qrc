@@ -1,15 +1,10 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
     <qresource>
-        <!-- Add your images here with the appropriate path -->
         <file alias="images/open.png">images/open.png</file>
-    </qresource>
-    <qresource>
-        <!-- Add your images here with the appropriate path -->
         <file alias="images/left_arrow.png">images/left_arrow.png</file>
-    </qresource>
-    <qresource>
-        <!-- Add your images here with the appropriate path -->
         <file alias="images/right_arrow.png">images/right_arrow.png</file>
+        <file alias="images/trash.png">images/trash.png</file>
+        <file alias="images/info.png">images/info.png</file>
     </qresource>
 </RCC>

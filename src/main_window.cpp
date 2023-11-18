@@ -1,18 +1,5 @@
 #include "main_window.hpp"
 
-// Function to create a new QIcon with a specified color
-QIcon createColorIcon(const QString &imagePath, const QColor &color, int size) {
-  QPixmap pixmap(imagePath);
-  pixmap =
-      pixmap.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-
-  QPainter painter(&pixmap);
-  painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
-  painter.fillRect(pixmap.rect(), color);
-
-  return QIcon(pixmap);
-}
-
 MainWindow::MainWindow() : QMainWindow() {
 
   // Set a dark color palette
@@ -96,48 +83,85 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(imageViewer, &ImageViewer::deleteRequested, this,
           &MainWindow::deleteCurrentImage);
 
+  m_infoSidebar = new VerticalSidebar(imageViewer);
+  m_infoSidebar->hide();
+
   auto centralWidget = new QWidget(this);
   auto vstackLayout = new QVBoxLayout();
   vstackLayout->addWidget(imageViewer);
   centralWidget->setLayout(vstackLayout);
 
-  auto toolbarWidget = new QWidget(this);
-  // Create two buttons
-  button1 = new QPushButton(this);
-  button1->setFixedSize(40, 40);
-  connect(button1, &QPushButton::pressed,
+  // Info (Image Info button)
+  m_infoButton = new QPushButton(this);
+  m_infoButton->setFixedSize(40, 40);
+  connect(m_infoButton, &QPushButton::pressed, [this]() {
+    if (!m_sidebarVisible) {
+      m_infoSidebar->show();
+      m_sidebarVisible = true;
+    } else {
+      m_infoSidebar->hide();
+      m_sidebarVisible = false;
+    }
+  });
+
+  // Left Arrow (Previous Image button)
+  m_leftArrowButton = new QPushButton(this);
+  m_leftArrowButton->setFixedSize(40, 40);
+  connect(m_leftArrowButton, &QPushButton::pressed,
           [this]() { emit previousImage(imageViewer->pixmap()); });
 
-  button2 = new QPushButton(this);
-  button2->setFixedSize(40, 40);
-  connect(button2, &QPushButton::pressed,
+  // Right Arrow (Next Image button)
+  m_rightArrowButton = new QPushButton(this);
+  m_rightArrowButton->setFixedSize(40, 40);
+  connect(m_rightArrowButton, &QPushButton::pressed,
           [this]() { emit nextImage(imageViewer->pixmap()); });
 
+  // Trash (Delete Image button)
+  m_trashButton = new QPushButton(this);
+  m_trashButton->setFixedSize(40, 40);
+  connect(m_trashButton, &QPushButton::pressed,
+          [this]() { confirmAndDeleteCurrentImage(); });
+
   // Create a layout and add buttons to it
+  auto toolbarWidget = new QWidget(this);
   QHBoxLayout *buttonLayout = new QHBoxLayout();
-  buttonLayout->addWidget(button1);
-  buttonLayout->addWidget(button2);
+  buttonLayout->addWidget(m_infoButton);
+  buttonLayout->addWidget(m_leftArrowButton);
+  buttonLayout->addWidget(m_rightArrowButton);
+  buttonLayout->addWidget(m_trashButton);
   toolbarWidget->setLayout(buttonLayout);
-  toolbarWidget->setFixedWidth(100);
+  // toolbarWidget->setFixedWidth(100);
 
   vstackLayout->addWidget(toolbarWidget, 0, Qt::AlignCenter);
 
   // Set the icon with a specific color
   QColor iconColor(Qt::white); // Set your desired color
-  button1->setIcon(createColorIcon(":/images/left_arrow.png", iconColor, 24));
-  button2->setIcon(createColorIcon(":/images/right_arrow.png", iconColor, 24));
+  m_infoButton->setIcon(createColorIcon(":/images/info.png", iconColor, 24));
+  m_leftArrowButton->setIcon(
+      createColorIcon(":/images/left_arrow.png", iconColor, 24));
+  m_rightArrowButton->setIcon(
+      createColorIcon(":/images/right_arrow.png", iconColor, 24));
+  m_trashButton->setIcon(createColorIcon(":/images/trash.png", iconColor, 24));
 
-  // button1->setStyleSheet("border: none;");
-  // button2->setStyleSheet("border: none;");
   imageViewer->setStyleSheet("border: none;");
   centralWidget->setStyleSheet("background-color: rgb(25, 25, 25);");
 
   setCentralWidget(centralWidget);
 
-  sidebar = new VerticalSidebar(this);
-  sidebar->hide();
-
   openImage();
+}
+
+QIcon MainWindow::createColorIcon(const QString &imagePath, const QColor &color,
+                                  int size) {
+  QPixmap pixmap(imagePath);
+  pixmap =
+      pixmap.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+  QPainter painter(&pixmap);
+  painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+  painter.fillRect(pixmap.rect(), color);
+
+  return QIcon(pixmap);
 }
 
 void MainWindow::openImage() {
@@ -155,7 +179,7 @@ void MainWindow::openImage() {
     emit loadImage(imagePath);
 
     QFileInfo fileInfo(imagePath);
-    sidebar->setFileName(fileInfo.fileName());
+    m_infoSidebar->setFileName(fileInfo.fileName());
   }
 }
 
@@ -238,23 +262,39 @@ void MainWindow::onImageLoaded(const QFileInfo &imageFileInfo,
   // Set the resized image to the QLabel
   imageViewer->setPixmap(imagePixmap, width() * 0.80, height() * 0.80);
 
-  sidebar->setFileName(imageFileInfo.fileName());
+  m_infoSidebar->setFileName(imageFileInfo.fileName());
 
   qint64 fileSize = imageFileInfo.size();
   QString prettySize = prettyPrintSize(fileSize);
-  sidebar->setFileSize(prettySize);
+  m_infoSidebar->setFileSize(prettySize);
 
   const auto documentType = getDocumentType(imageFileInfo);
-  sidebar->setFileType(documentType);
+  m_infoSidebar->setFileType(documentType);
 }
 
 void MainWindow::onNoMoreImagesLeft() {
   auto emptyImage = QImage(0, 0, QImage::Format_ARGB32);
   auto emptyPixmap = QPixmap::fromImage(emptyImage);
   imageViewer->setPixmap(emptyPixmap, 0, 0);
-  sidebar->setFileName("");
-  sidebar->setFileSize("");
-  sidebar->setFileType("");
+  m_infoSidebar->setFileName("");
+  m_infoSidebar->setFileSize("");
+  m_infoSidebar->setFileType("");
+}
+
+void MainWindow::confirmAndDeleteCurrentImage() {
+
+  // Display a confirmation dialog
+  QMessageBox::StandardButton reply = QMessageBox::question(
+      this, "Delete Confirmation", "Do you really want to delete this item?",
+      QMessageBox::Yes | QMessageBox::No);
+
+  // Check the user's response
+  if (reply == QMessageBox::Yes) {
+    emit deleteCurrentImage();
+  } else {
+    // User clicked 'No' or closed the dialog
+    qDebug() << "Deletion canceled.";
+  }
 }
 
 bool MainWindow::event(QEvent *event) {
@@ -264,26 +304,23 @@ bool MainWindow::event(QEvent *event) {
     Qt::Key key = static_cast<Qt::Key>(keyEvent->key());
     Qt::KeyboardModifiers modifiers = keyEvent->modifiers();
 
-    if ((key == Qt::Key_N || key == Qt::Key_Right) &&
-        modifiers == Qt::NoModifier) {
+    if ((key == Qt::Key_N || key == Qt::Key_Right)/* &&
+        modifiers == Qt::NoModifier*/) {
       emit nextImage(imageViewer->pixmap());
       return true; // Event handled
-    } else if ((key == Qt::Key_P || key == Qt::Key_Left) &&
-               modifiers == Qt::NoModifier) {
+    } else if ((key == Qt::Key_P || key == Qt::Key_Left)/* &&
+               modifiers == Qt::NoModifier*/) {
       emit previousImage(imageViewer->pixmap());
       return true; // Event handled
     } else if (key == Qt::Key_I && modifiers == Qt::NoModifier) {
-      if (!sidebarVisible) {
-        sidebar->show();
-        sidebarVisible = true;
+      if (!m_sidebarVisible) {
+        m_infoSidebar->show();
+        m_sidebarVisible = true;
       } else {
-        sidebar->hide();
-        sidebarVisible = false;
+        m_infoSidebar->hide();
+        m_sidebarVisible = false;
       }
       return true; // Event handled
-    } else if (key == Qt::Key_D && modifiers == Qt::NoModifier) {
-      // Delete current image
-      emit deleteCurrentImage();
     }
   }
 

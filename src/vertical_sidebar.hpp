@@ -25,16 +25,22 @@ public:
         QLabel *fileNameLabel = new QLabel("File name ");
         fileNameValue = new QLabel(""); // Default value
         layout->addRow(fileNameLabel, fileNameValue);
+		fileNameLabel->setAttribute(Qt::WA_TranslucentBackground);
+		fileNameValue->setAttribute(Qt::WA_TranslucentBackground);
 
         // File Size
         QLabel *fileSizeLabel = new QLabel("File size ");
         fileSizeValue = new QLabel(""); // Default value
         layout->addRow(fileSizeLabel, fileSizeValue);
+		fileSizeLabel->setAttribute(Qt::WA_TranslucentBackground);
+		fileSizeValue->setAttribute(Qt::WA_TranslucentBackground);
 
         // File Type
         QLabel *fileTypeLabel = new QLabel("Document type ");
         fileTypeValue = new QLabel(""); // Default value
         layout->addRow(fileTypeLabel, fileTypeValue);
+		fileTypeLabel->setAttribute(Qt::WA_TranslucentBackground);
+		fileTypeValue->setAttribute(Qt::WA_TranslucentBackground);
 
         // Calculate the preferred height based on the content
         int preferredHeight = sizeHint().height();

@@ -50,6 +50,8 @@ signals:
 private:
   void zoomIn();
   void zoomOut();
+  static QIcon createColorIcon(const QString &imagePath, const QColor &color, int size);
+  void confirmAndDeleteCurrentImage();
 
 private:
   QLabel canvasLabel;
@@ -57,10 +59,12 @@ private:
   ImageLoader *imageLoader;
   QThread *imageLoaderThread;
 
-  bool sidebarVisible{false};
-  VerticalSidebar* sidebar;
+  bool m_sidebarVisible{false};
+  VerticalSidebar* m_infoSidebar;
   ImageViewer *imageViewer;
 
-  QPushButton *button1;
-  QPushButton *button2;
+  QPushButton *m_infoButton;
+  QPushButton *m_leftArrowButton;
+  QPushButton *m_rightArrowButton;
+  QPushButton *m_trashButton;
 };
