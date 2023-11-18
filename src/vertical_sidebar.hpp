@@ -4,6 +4,7 @@
 #include <QPaintEvent>
 
 class VerticalSidebar : public QWidget {
+	QLabel* filePositionHeader;
 	QLabel* fileNameValue;
 	QLabel* fileSizeValue;
 	QLabel* fileTypeValue;
@@ -15,6 +16,9 @@ public:
 
         QVBoxLayout *mainLayout = new QVBoxLayout(this);
         mainLayout->setContentsMargins(20, 20, 20, 20); // Set margins on all sides
+
+		filePositionHeader = new QLabel("1/5");
+		mainLayout->addWidget(filePositionHeader, 0, Qt::AlignCenter);
 
         QFormLayout *layout = new QFormLayout();
         layout->setLabelAlignment(Qt::AlignLeft);
@@ -62,6 +66,10 @@ public:
 
 		move(20, 20);
     }
+
+	void setFilePosition(const QString& filePosition) {
+		filePositionHeader->setText(filePosition);
+	}
 
 	void setFileName(const QString& fileName) {
 		fileNameValue->setText(fileName);
