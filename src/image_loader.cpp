@@ -315,5 +315,7 @@ void ImageLoader::deleteCurrentImage() {
 }
 
 QString ImageLoader::getHeaderLabel() const {
-  return QString("%1/%2").arg(m_currentIndex + 1).arg(m_imageFilePaths.size());
+  return QString("%1 / %2")
+      .arg(m_currentIndex + 1)
+      .arg(m_imageFilePaths.size());
 }
