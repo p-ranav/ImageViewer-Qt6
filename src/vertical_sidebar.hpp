@@ -43,6 +43,12 @@ public:
 		fileTypeLabel->setAttribute(Qt::WA_TranslucentBackground);
 		fileTypeValue->setAttribute(Qt::WA_TranslucentBackground);
 
+		// Add a horizontal line
+		QFrame* horizontalLine = new QFrame();
+		horizontalLine->setFrameShape(QFrame::HLine);
+		horizontalLine->setFrameShadow(QFrame::Sunken);
+		layout->addRow(horizontalLine);
+
         // Image Resolution
         QLabel *imageResolutionLabel = new QLabel("Image resolution ");
         imageResolutionValue = new QLabel(""); // Default value
