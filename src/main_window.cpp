@@ -32,9 +32,11 @@ MainWindow::MainWindow() : QMainWindow() {
 
   // Connect signals and slots for image loading
   connect(this, &MainWindow::loadImage, imageLoader, &ImageLoader::loadImage);
-  connect(this, &MainWindow::nextImage, imageLoader, &ImageLoader::nextImage);
+  connect(this, &MainWindow::goBackward, imageLoader, &ImageLoader::goBackward);
   connect(this, &MainWindow::previousImage, imageLoader,
           &ImageLoader::previousImage);
+  connect(this, &MainWindow::nextImage, imageLoader, &ImageLoader::nextImage);
+  connect(this, &MainWindow::goForward, imageLoader, &ImageLoader::goForward);
   connect(this, &MainWindow::deleteCurrentImage, imageLoader,
           &ImageLoader::deleteCurrentImage);
   connect(imageLoader, &ImageLoader::noMoreImagesLeft, this,
@@ -104,6 +106,12 @@ MainWindow::MainWindow() : QMainWindow() {
     }
   });
 
+  // Go Backward (Go 10 Images back)
+  m_backward10Button = new QPushButton(this);
+  m_backward10Button->setFixedSize(40, 40);
+  connect(m_backward10Button, &QPushButton::pressed,
+          [this]() { emit goBackward(); });
+
   // Left Arrow (Previous Image button)
   m_leftArrowButton = new QPushButton(this);
   m_leftArrowButton->setFixedSize(40, 40);
@@ -116,6 +124,12 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(m_rightArrowButton, &QPushButton::pressed,
           [this]() { emit nextImage(imageViewer->pixmap()); });
 
+  // Skip Forward (Go 10 Images forward)
+  m_forward10Button = new QPushButton(this);
+  m_forward10Button->setFixedSize(40, 40);
+  connect(m_forward10Button, &QPushButton::pressed,
+          [this]() { emit goForward(); });
+
   // Trash (Delete Image button)
   m_trashButton = new QPushButton(this);
   m_trashButton->setFixedSize(40, 40);
@@ -126,8 +140,10 @@ MainWindow::MainWindow() : QMainWindow() {
   auto toolbarWidget = new QWidget(this);
   QHBoxLayout *buttonLayout = new QHBoxLayout();
   buttonLayout->addWidget(m_infoButton);
+  buttonLayout->addWidget(m_backward10Button);
   buttonLayout->addWidget(m_leftArrowButton);
   buttonLayout->addWidget(m_rightArrowButton);
+  buttonLayout->addWidget(m_forward10Button);
   buttonLayout->addWidget(m_trashButton);
   toolbarWidget->setLayout(buttonLayout);
   // toolbarWidget->setFixedWidth(100);
@@ -137,10 +153,14 @@ MainWindow::MainWindow() : QMainWindow() {
   // Set the icon with a specific color
   QColor iconColor(Qt::white); // Set your desired color
   m_infoButton->setIcon(createColorIcon(":/images/info.png", iconColor, 24));
+  m_backward10Button->setIcon(
+      createColorIcon(":/images/backward_10.png", iconColor, 24));
   m_leftArrowButton->setIcon(
       createColorIcon(":/images/left_arrow.png", iconColor, 24));
   m_rightArrowButton->setIcon(
       createColorIcon(":/images/right_arrow.png", iconColor, 24));
+  m_forward10Button->setIcon(
+      createColorIcon(":/images/forward_10.png", iconColor, 24));
   m_trashButton->setIcon(createColorIcon(":/images/trash.png", iconColor, 24));
 
   imageViewer->setStyleSheet("border: none;");

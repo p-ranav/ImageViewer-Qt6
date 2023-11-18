@@ -6,5 +6,7 @@
         <file alias="images/right_arrow.png">images/right_arrow.png</file>
         <file alias="images/trash.png">images/trash.png</file>
         <file alias="images/info.png">images/info.png</file>
+        <file alias="images/forward_10.png">images/forward_10.png</file>
+        <file alias="images/backward_10.png">images/backward_10.png</file>
     </qresource>
 </RCC>

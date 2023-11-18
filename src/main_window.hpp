@@ -43,8 +43,10 @@ protected:
 
 signals:
   void loadImage(const QString &imagePath);
-  void nextImage(const QPixmap &currentPixmap);
+  void goBackward();
   void previousImage(const QPixmap &currentPixmap);
+  void nextImage(const QPixmap &currentPixmap);
+  void goForward();
   void deleteCurrentImage();
 
 private:
@@ -64,7 +66,9 @@ private:
   ImageViewer *imageViewer;
 
   QPushButton *m_infoButton;
+  QPushButton *m_backward10Button;
   QPushButton *m_leftArrowButton;
   QPushButton *m_rightArrowButton;
+  QPushButton *m_forward10Button;
   QPushButton *m_trashButton;
 };

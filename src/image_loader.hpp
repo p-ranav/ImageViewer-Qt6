@@ -48,8 +48,10 @@ public:
 
 public slots:
   void loadImage(const QString &imagePath);
-  void nextImage(const QPixmap &currentPixmap);
+  void goBackward();
   void previousImage(const QPixmap &currentPixmap);
+  void nextImage(const QPixmap &currentPixmap);
+  void goForward();
   void deleteCurrentImage();
 
 signals:

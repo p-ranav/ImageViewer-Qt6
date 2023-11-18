@@ -151,6 +151,16 @@ bool ImageLoader::hasPrevious() const {
   return m_imageFilePaths.size() > 0 && (m_currentIndex >= 1);
 }
 
+void ImageLoader::goBackward() {
+  if (m_currentIndex >= 10) {
+    m_currentIndex -= 10;
+  } else {
+    m_currentIndex = 0;
+  }
+
+  loadImage(QString::fromStdString(m_imageFilePaths[m_currentIndex]));
+}
+
 void ImageLoader::previousImage(const QPixmap &currentPixmap) {
   if (hasPrevious()) {
 
@@ -198,6 +208,18 @@ void ImageLoader::nextImage(const QPixmap &currentPixmap) {
         QString::fromStdString(m_imageFilePaths[m_currentIndex + 1]),
         m_nextPixmap, true, m_nextImageWidth, m_nextImageHeight);
   }
+}
+
+void ImageLoader::goForward() {
+  m_currentIndex += 10;
+
+  const auto maxImageFiles = m_imageFilePaths.size() - 1;
+
+  if (m_currentIndex > maxImageFiles) {
+    m_currentIndex = maxImageFiles;
+  }
+
+  loadImage(QString::fromStdString(m_imageFilePaths[m_currentIndex]));
 }
 
 QString ImageLoader::getCurrentImageFilePath() {
