@@ -40,5 +40,5 @@ protected:
   bool nativeGestureEvent(QNativeGestureEvent *event);
   void keyPressEvent(QKeyEvent *event) override;
   void contextMenuEvent(QContextMenuEvent* event) override;
-  void mouseDoubleClickEvent(QMouseEvent *event) override;
+  // void mouseDoubleClickEvent(QMouseEvent *event) override;
 };

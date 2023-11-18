@@ -127,8 +127,8 @@ MainWindow::MainWindow() : QMainWindow() {
   button1->setIcon(createColorIcon(":/images/left_arrow.png", iconColor, 24));
   button2->setIcon(createColorIcon(":/images/right_arrow.png", iconColor, 24));
 
-  button1->setStyleSheet("border: none;");
-  button2->setStyleSheet("border: none;");
+  // button1->setStyleSheet("border: none;");
+  // button2->setStyleSheet("border: none;");
   imageViewer->setStyleSheet("border: none;");
   centralWidget->setStyleSheet("background-color: rgb(25, 25, 25);");
 
@@ -304,6 +304,21 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
   imageViewer->resize(desiredWidth, desiredHeight);
 
   QMainWindow::resizeEvent(event);
+}
+
+void MainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
+  if (event->button() == Qt::LeftButton) {
+    // Handle left mouse button double click
+    QPointF scenePos = imageViewer->mapToScene(event->pos());
+    qDebug() << "Double click at scene coordinates:" << scenePos;
+
+    auto desiredWidth = width() * 0.80;
+    auto desiredHeight = height() * 0.95;
+    imageViewer->resize(desiredWidth, desiredHeight);
+  }
+
+  // Call the base class implementation
+  QMainWindow::mouseDoubleClickEvent(event);
 }
 
 void MainWindow::zoomIn() { imageViewer->zoomIn(); }

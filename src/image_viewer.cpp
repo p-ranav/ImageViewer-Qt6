@@ -134,24 +134,24 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
   }
 }
 
-void ImageViewer::mouseDoubleClickEvent(QMouseEvent *event) {
-  if (event->button() == Qt::LeftButton) {
-    // Handle left mouse button double click
-    QPointF scenePos = mapToScene(event->pos());
-    qDebug() << "Double click at scene coordinates:" << scenePos;
+// void ImageViewer::mouseDoubleClickEvent(QMouseEvent *event) {
+//   if (event->button() == Qt::LeftButton) {
+//     // Handle left mouse button double click
+//     QPointF scenePos = mapToScene(event->pos());
+//     qDebug() << "Double click at scene coordinates:" << scenePos;
 
-    auto maybeSize = getMainWindowSize();
-    if (maybeSize.has_value()) {
-      auto size = maybeSize.value();
-      auto desiredWidth = size.width() * 0.80;
-      auto desiredHeight = size.height() * 0.95;
-      resize(desiredWidth, desiredHeight);
-    }
-  }
+//     auto maybeSize = getMainWindowSize();
+//     if (maybeSize.has_value()) {
+//       auto size = maybeSize.value();
+//       auto desiredWidth = size.width() * 0.80;
+//       auto desiredHeight = size.height() * 0.95;
+//       resize(desiredWidth, desiredHeight);
+//     }
+//   }
 
-  // Call the base class implementation
-  QGraphicsView::mouseDoubleClickEvent(event);
-}
+//   // Call the base class implementation
+//   QGraphicsView::mouseDoubleClickEvent(event);
+// }
 
 std::optional<QSize> ImageViewer::getMainWindowSize() const {
   // Get the QMainWindow size from the QGraphicsView
