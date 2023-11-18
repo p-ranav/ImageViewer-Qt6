@@ -32,7 +32,7 @@ public slots:
   void openImage();
   void quickExportAsPng();
   void copyToClipboard();
-  void onImageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap);
+  void onImageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap, int imageWidth, int imageHeight);
   void onNoMoreImagesLeft();
 
 protected:

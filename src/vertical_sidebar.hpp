@@ -7,6 +7,7 @@ class VerticalSidebar : public QWidget {
 	QLabel* fileNameValue;
 	QLabel* fileSizeValue;
 	QLabel* fileTypeValue;
+	QLabel* imageResolutionValue;
 public:
     VerticalSidebar(QWidget *parent = nullptr) : QWidget(parent) {
         setAttribute(Qt::WA_TranslucentBackground); // Enable translucent background
@@ -42,6 +43,13 @@ public:
 		fileTypeLabel->setAttribute(Qt::WA_TranslucentBackground);
 		fileTypeValue->setAttribute(Qt::WA_TranslucentBackground);
 
+        // Image Resolution
+        QLabel *imageResolutionLabel = new QLabel("Image resolution ");
+        imageResolutionValue = new QLabel(""); // Default value
+        layout->addRow(imageResolutionLabel, imageResolutionValue);
+		imageResolutionLabel->setAttribute(Qt::WA_TranslucentBackground);
+		imageResolutionValue->setAttribute(Qt::WA_TranslucentBackground);
+
         // Calculate the preferred height based on the content
         int preferredHeight = sizeHint().height();
         setFixedHeight(preferredHeight);
@@ -59,6 +67,10 @@ public:
 
 	void setFileType(const QString& fileType) {
 		fileTypeValue->setText(fileType);
+	}
+
+	void setImageResolution(const QString& imageResolution) {
+		imageResolutionValue->setText(imageResolution);
 	}
 
 protected:

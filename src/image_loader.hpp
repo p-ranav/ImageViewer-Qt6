@@ -21,13 +21,22 @@ class ImageLoader : public QObject {
 
   std::vector<std::string> m_imageFilePaths;
   std::size_t m_currentIndex{0};
+
+  int m_previousImageWidth;
+  int m_previousImageHeight;
   QPixmap m_previousPixmap;
+  
+  int m_nextImageWidth;
+  int m_nextImageHeight;
   QPixmap m_nextPixmap;
 
+  int m_currentImageWidth;
+  int m_currentImageHeight;
+
   void loadImagePathsIfEmpty(const char* directory, const char* current_file);
-  void loadRaw(const QString &imagePath, QPixmap& imagePixmap, bool half_size);
-  void loadWithImageReader(const QString &imagePath, QPixmap& imagePixmap);
-  void loadImageIntoPixmap(const QString &imagePath, QPixmap& imagePixmap, bool half_size);
+  void loadRaw(const QString &imagePath, QPixmap& imagePixmap, bool half_size, int& width, int& height);
+  void loadWithImageReader(const QString &imagePath, QPixmap& imagePixmap, int& width, int& height);
+  void loadImageIntoPixmap(const QString &imagePath, QPixmap& imagePixmap, bool half_size, int& width, int& height);
 
 public:
   ImageLoader();
@@ -44,6 +53,6 @@ public slots:
   void deleteCurrentImage();
 
 signals:
-  void imageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap);
+  void imageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap, int imageWidth, int imageHeight);
   void noMoreImagesLeft();
 };

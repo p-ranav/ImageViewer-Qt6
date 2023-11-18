@@ -258,7 +258,8 @@ QString getDocumentType(const QFileInfo &fileInfo) {
 }
 
 void MainWindow::onImageLoaded(const QFileInfo &imageFileInfo,
-                               const QPixmap &imagePixmap) {
+                               const QPixmap &imagePixmap, int imageWidth,
+                               int imageHeight) {
   // Set the resized image to the QLabel
   imageViewer->setPixmap(imagePixmap, width() * 0.80, height() * 0.80);
 
@@ -270,6 +271,10 @@ void MainWindow::onImageLoaded(const QFileInfo &imageFileInfo,
 
   const auto documentType = getDocumentType(imageFileInfo);
   m_infoSidebar->setFileType(documentType);
+
+  const auto imageResolution =
+      QString("%1 x %2").arg(imageWidth).arg(imageHeight);
+  m_infoSidebar->setImageResolution(imageResolution);
 }
 
 void MainWindow::onNoMoreImagesLeft() {
