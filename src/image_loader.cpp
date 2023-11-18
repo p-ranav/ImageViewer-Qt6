@@ -194,7 +194,7 @@ void ImageLoader::deleteCurrentImage() {
 
   auto imagePath = m_imageFilePaths[m_currentIndex];
 
-  // Delete image 
+  // Delete image
   QFile file(QString::fromStdString(imagePath));
   file.moveToTrash();
 

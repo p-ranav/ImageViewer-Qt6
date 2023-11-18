@@ -20,6 +20,7 @@ class ImageViewer : public QGraphicsView {
 
 signals:
     void copyRequested();
+    void deleteRequested();
 
 private:
   std::optional<QSize> getMainWindowSize() const;

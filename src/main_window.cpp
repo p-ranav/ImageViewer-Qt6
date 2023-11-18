@@ -80,6 +80,8 @@ MainWindow::MainWindow() : QMainWindow() {
   imageViewer = new ImageViewer(this);
   connect(imageViewer, &ImageViewer::copyRequested, this,
           &MainWindow::copyToClipboard);
+  connect(imageViewer, &ImageViewer::deleteRequested, this,
+          &MainWindow::deleteCurrentImage);
 
   setCentralWidget(imageViewer);
 

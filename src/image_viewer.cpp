@@ -124,10 +124,13 @@ void ImageViewer::keyPressEvent(QKeyEvent *event) {
 void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
   QMenu menu(this);
   QAction *copyAction = menu.addAction("Copy");
+  QAction *deleteAction = menu.addAction("Delete");
   QAction *selectedItem = menu.exec(event->globalPos());
 
   if (selectedItem == copyAction) {
     emit copyRequested();
+  } else if (selectedItem == deleteAction) {
+    emit deleteRequested();
   }
 }
 
