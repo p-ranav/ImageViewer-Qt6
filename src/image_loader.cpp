@@ -204,9 +204,11 @@ void ImageLoader::nextImage(const QPixmap &currentPixmap) {
     m_currentImageHeight = m_nextImageHeight;
 
     m_currentIndex += 1;
-    loadImageIntoPixmap(
-        QString::fromStdString(m_imageFilePaths[m_currentIndex + 1]),
-        m_nextPixmap, true, m_nextImageWidth, m_nextImageHeight);
+    if (m_currentIndex + 1 < m_imageFilePaths.size()) {
+      loadImageIntoPixmap(
+          QString::fromStdString(m_imageFilePaths[m_currentIndex + 1]),
+          m_nextPixmap, true, m_nextImageWidth, m_nextImageHeight);
+    }
   }
 }
 
