@@ -60,4 +60,7 @@ private:
   bool sidebarVisible{false};
   VerticalSidebar* sidebar;
   ImageViewer *imageViewer;
+
+  QPushButton *button1;
+  QPushButton *button2;
 };

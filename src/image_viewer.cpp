@@ -85,7 +85,7 @@ void ImageViewer::wheelEvent(QWheelEvent *event) {
       scale(1.05);
     } else {
       // Zooming out (zooming down)
-      scale(0.95);
+      scale(0.80);
     }
   }
   QGraphicsView::wheelEvent(event);
@@ -100,7 +100,7 @@ bool ImageViewer::nativeGestureEvent(QNativeGestureEvent *event) {
       scale(1.05);
     } else if (scaleFactor < 0.0) {
       // Zooming out (zooming down)
-      scale(0.95);
+      scale(0.80);
     }
 
     return true;
@@ -144,7 +144,7 @@ void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
 //     if (maybeSize.has_value()) {
 //       auto size = maybeSize.value();
 //       auto desiredWidth = size.width() * 0.80;
-//       auto desiredHeight = size.height() * 0.95;
+//       auto desiredHeight = size.height() * 0.80;
 //       resize(desiredWidth, desiredHeight);
 //     }
 //   }

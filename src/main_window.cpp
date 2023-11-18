@@ -103,12 +103,12 @@ MainWindow::MainWindow() : QMainWindow() {
 
   auto toolbarWidget = new QWidget(this);
   // Create two buttons
-  QPushButton *button1 = new QPushButton(this);
+  button1 = new QPushButton(this);
   button1->setFixedSize(40, 40);
   connect(button1, &QPushButton::pressed,
           [this]() { emit previousImage(imageViewer->pixmap()); });
 
-  QPushButton *button2 = new QPushButton(this);
+  button2 = new QPushButton(this);
   button2->setFixedSize(40, 40);
   connect(button2, &QPushButton::pressed,
           [this]() { emit nextImage(imageViewer->pixmap()); });
@@ -236,7 +236,7 @@ QString getDocumentType(const QFileInfo &fileInfo) {
 void MainWindow::onImageLoaded(const QFileInfo &imageFileInfo,
                                const QPixmap &imagePixmap) {
   // Set the resized image to the QLabel
-  imageViewer->setPixmap(imagePixmap, width() * 0.80, height() * 0.95);
+  imageViewer->setPixmap(imagePixmap, width() * 0.80, height() * 0.80);
 
   sidebar->setFileName(imageFileInfo.fileName());
 
@@ -300,7 +300,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
   auto desiredWidth = width() * 0.80;
-  auto desiredHeight = height() * 0.95;
+  auto desiredHeight = height() * 0.80;
   imageViewer->resize(desiredWidth, desiredHeight);
 
   QMainWindow::resizeEvent(event);
@@ -313,7 +313,7 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
     qDebug() << "Double click at scene coordinates:" << scenePos;
 
     auto desiredWidth = width() * 0.80;
-    auto desiredHeight = height() * 0.95;
+    auto desiredHeight = height() * 0.80;
     imageViewer->resize(desiredWidth, desiredHeight);
   }
 
