@@ -86,6 +86,7 @@ MainWindow::MainWindow() : QMainWindow() {
           &MainWindow::deleteCurrentImage);
 
   m_infoSidebar = new VerticalSidebar(imageViewer);
+  m_infoSidebar->setPalette(darkPalette);
   m_infoSidebar->hide();
 
   auto centralWidget = new QWidget(this);
@@ -283,6 +284,8 @@ void MainWindow::onImageLoaded(const QFileInfo &imageFileInfo,
   // Set the resized image to the QLabel
   imageViewer->setPixmap(imagePixmap, width() * 0.80, height() * 0.80);
 
+  m_infoSidebar->setFixedWidth(imageViewer->width());
+
   m_infoSidebar->setFilePosition(imageLoader->getHeaderLabel());
 
   m_infoSidebar->setFileName(imageFileInfo.fileName());
@@ -339,15 +342,6 @@ bool MainWindow::event(QEvent *event) {
                modifiers == Qt::NoModifier*/) {
       emit previousImage(imageViewer->pixmap());
       return true; // Event handled
-    } else if (key == Qt::Key_I && modifiers == Qt::NoModifier) {
-      if (!m_sidebarVisible) {
-        m_infoSidebar->show();
-        m_sidebarVisible = true;
-      } else {
-        m_infoSidebar->hide();
-        m_sidebarVisible = false;
-      }
-      return true; // Event handled
     }
   }
 
@@ -366,6 +360,7 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
   auto desiredWidth = width() * 0.80;
   auto desiredHeight = height() * 0.80;
   imageViewer->resize(desiredWidth, desiredHeight);
+  m_infoSidebar->setFixedWidth(imageViewer->width());
 
   QMainWindow::resizeEvent(event);
 }

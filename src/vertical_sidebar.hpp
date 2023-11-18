@@ -12,12 +12,13 @@ class VerticalSidebar : public QWidget {
 public:
     VerticalSidebar(QWidget *parent = nullptr) : QWidget(parent) {
         setAttribute(Qt::WA_TranslucentBackground); // Enable translucent background
-        setFixedSize(500, parentWidget()->height()); // Set the size of the sidebar
+        setFixedSize(parentWidget()->width(), parentWidget()->height()); // Set the size of the sidebar
 
         QVBoxLayout *mainLayout = new QVBoxLayout(this);
         mainLayout->setContentsMargins(20, 20, 20, 20); // Set margins on all sides
 
 		filePositionHeader = new QLabel("1/5");
+		filePositionHeader->setAttribute(Qt::WA_TranslucentBackground);
 		mainLayout->addWidget(filePositionHeader, 0, Qt::AlignCenter);
 
         QFormLayout *layout = new QFormLayout();
@@ -49,6 +50,7 @@ public:
 
 		// Add a horizontal line
 		QFrame* horizontalLine = new QFrame();
+		horizontalLine->setLineWidth(1);
 		horizontalLine->setFrameShape(QFrame::HLine);
 		horizontalLine->setFrameShadow(QFrame::Sunken);
 		layout->addRow(horizontalLine);
