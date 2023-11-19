@@ -7,6 +7,7 @@ ImageViewer::ImageViewer(QWidget *parent) : QGraphicsView(parent) {
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   setResizeAnchor(QGraphicsView::AnchorViewCenter);
+  setStyleSheet("background: transparent");
 }
 
 void ImageViewer::setPixmap(const QPixmap &pixmap, int desiredWidth,
@@ -25,8 +26,6 @@ void ImageViewer::setPixmap(const QPixmap &pixmap, int desiredWidth,
   qreal scaleFactorWidth = static_cast<qreal>(desiredWidth) / pixmap.width();
   qreal scaleFactorHeight = static_cast<qreal>(desiredHeight) / pixmap.height();
   qreal scaleFactor = qMin(scaleFactorWidth, scaleFactorHeight);
-  //   // Calculate the scale factor to achieve the desired height
-  //   qreal scaleFactor = static_cast<qreal>(desiredHeight) / pixmap.height();
 
   // Scale the QGraphicsPixmapItem
   QGraphicsView::resetTransform();

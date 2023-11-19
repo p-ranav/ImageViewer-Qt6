@@ -2,25 +2,6 @@
 
 MainWindow::MainWindow() : QMainWindow() {
 
-  // Set a dark color palette
-  QPalette darkPalette;
-  darkPalette.setColor(QPalette::Window, QColor(53, 53, 53));
-  darkPalette.setColor(QPalette::WindowText, Qt::white);
-  darkPalette.setColor(QPalette::Base, QColor(25, 25, 25));
-  darkPalette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
-  darkPalette.setColor(QPalette::ToolTipBase, Qt::white);
-  darkPalette.setColor(QPalette::ToolTipText, Qt::white);
-  darkPalette.setColor(QPalette::Text, Qt::white);
-  darkPalette.setColor(QPalette::Button, QColor(42, 130, 218)); // Blue color
-  darkPalette.setColor(QPalette::ButtonText, Qt::white);
-  darkPalette.setColor(QPalette::BrightText, Qt::red);
-  darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
-  darkPalette.setColor(QPalette::Highlight, QColor(42, 130, 218));
-  darkPalette.setColor(QPalette::HighlightedText, Qt::black);
-
-  // Apply the dark color palette to the application
-  setPalette(darkPalette);
-
   // Create a fixed-size QPixmap on startup
   QRect primaryScreenGeometry = QApplication::primaryScreen()->geometry();
   setGeometry(primaryScreenGeometry);
@@ -85,8 +66,7 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(imageViewer, &ImageViewer::deleteRequested, this,
           &MainWindow::deleteCurrentImage);
 
-  m_infoSidebar = new VerticalSidebar(imageViewer);
-  m_infoSidebar->setPalette(darkPalette);
+  m_infoSidebar = new VerticalSidebar();
   m_infoSidebar->hide();
 
   auto centralWidget = new QWidget(this);
@@ -107,12 +87,6 @@ MainWindow::MainWindow() : QMainWindow() {
     }
   });
 
-  // Go Backward (Go 10 Images back)
-  m_backward10Button = new QPushButton(this);
-  m_backward10Button->setFixedSize(40, 40);
-  connect(m_backward10Button, &QPushButton::pressed,
-          [this]() { emit goBackward(); });
-
   // Left Arrow (Previous Image button)
   m_leftArrowButton = new QPushButton(this);
   m_leftArrowButton->setFixedSize(40, 40);
@@ -125,12 +99,6 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(m_rightArrowButton, &QPushButton::pressed,
           [this]() { emit nextImage(imageViewer->pixmap()); });
 
-  // Skip Forward (Go 10 Images forward)
-  m_forward10Button = new QPushButton(this);
-  m_forward10Button->setFixedSize(40, 40);
-  connect(m_forward10Button, &QPushButton::pressed,
-          [this]() { emit goForward(); });
-
   // Trash (Delete Image button)
   m_trashButton = new QPushButton(this);
   m_trashButton->setFixedSize(40, 40);
@@ -141,31 +109,21 @@ MainWindow::MainWindow() : QMainWindow() {
   auto toolbarWidget = new QWidget(this);
   QHBoxLayout *buttonLayout = new QHBoxLayout();
   buttonLayout->addWidget(m_infoButton);
-  buttonLayout->addWidget(m_backward10Button);
   buttonLayout->addWidget(m_leftArrowButton);
   buttonLayout->addWidget(m_rightArrowButton);
-  buttonLayout->addWidget(m_forward10Button);
   buttonLayout->addWidget(m_trashButton);
   toolbarWidget->setLayout(buttonLayout);
-  // toolbarWidget->setFixedWidth(100);
 
   vstackLayout->addWidget(toolbarWidget, 0, Qt::AlignCenter);
 
   // Set the icon with a specific color
   QColor iconColor(Qt::white); // Set your desired color
   m_infoButton->setIcon(createColorIcon(":/images/info.png", iconColor, 24));
-  m_backward10Button->setIcon(
-      createColorIcon(":/images/backward_10.png", iconColor, 24));
   m_leftArrowButton->setIcon(
       createColorIcon(":/images/left_arrow.png", iconColor, 24));
   m_rightArrowButton->setIcon(
       createColorIcon(":/images/right_arrow.png", iconColor, 24));
-  m_forward10Button->setIcon(
-      createColorIcon(":/images/forward_10.png", iconColor, 24));
   m_trashButton->setIcon(createColorIcon(":/images/trash.png", iconColor, 24));
-
-  imageViewer->setStyleSheet("border: none;");
-  centralWidget->setStyleSheet("background-color: rgb(25, 25, 25);");
 
   setCentralWidget(centralWidget);
 
@@ -284,8 +242,6 @@ void MainWindow::onImageLoaded(const QFileInfo &imageFileInfo,
   // Set the resized image to the QLabel
   imageViewer->setPixmap(imagePixmap, width() * 0.80, height() * 0.80);
 
-  m_infoSidebar->setFixedWidth(imageViewer->width());
-
   m_infoSidebar->setFilePosition(imageLoader->getHeaderLabel());
 
   m_infoSidebar->setFileName(imageFileInfo.fileName());
@@ -332,7 +288,6 @@ bool MainWindow::event(QEvent *event) {
     // Handle the key press event here
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
     Qt::Key key = static_cast<Qt::Key>(keyEvent->key());
-    Qt::KeyboardModifiers modifiers = keyEvent->modifiers();
 
     if ((key == Qt::Key_N || key == Qt::Key_Right)/* &&
         modifiers == Qt::NoModifier*/) {
@@ -360,7 +315,6 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
   auto desiredWidth = width() * 0.80;
   auto desiredHeight = height() * 0.80;
   imageViewer->resize(desiredWidth, desiredHeight);
-  m_infoSidebar->setFixedWidth(imageViewer->width());
 
   QMainWindow::resizeEvent(event);
 }

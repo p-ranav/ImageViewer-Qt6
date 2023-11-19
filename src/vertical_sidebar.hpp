@@ -11,9 +11,6 @@ class VerticalSidebar : public QWidget {
 	QLabel* imageResolutionValue;
 public:
     VerticalSidebar(QWidget *parent = nullptr) : QWidget(parent) {
-        setAttribute(Qt::WA_TranslucentBackground); // Enable translucent background
-        setFixedSize(parentWidget()->width(), parentWidget()->height()); // Set the size of the sidebar
-
         QVBoxLayout *mainLayout = new QVBoxLayout(this);
         mainLayout->setContentsMargins(20, 20, 20, 20); // Set margins on all sides
 
@@ -88,14 +85,4 @@ public:
 	void setImageResolution(const QString& imageResolution) {
 		imageResolutionValue->setText(imageResolution);
 	}
-
-protected:
-    void paintEvent(QPaintEvent *) override {
-        QPainter painter(this);
-        painter.fillRect(rect(), QColor(0, 0, 0, 150)); // Set the background color and alpha
-    }
-
-    QSize sizeHint() const override {
-        return QSize(200, QWidget::sizeHint().height()); // Set the preferred width
-    }
 };

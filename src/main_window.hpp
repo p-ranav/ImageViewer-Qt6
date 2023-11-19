@@ -66,9 +66,7 @@ private:
   ImageViewer *imageViewer;
 
   QPushButton *m_infoButton;
-  QPushButton *m_backward10Button;
   QPushButton *m_leftArrowButton;
   QPushButton *m_rightArrowButton;
-  QPushButton *m_forward10Button;
   QPushButton *m_trashButton;
 };
