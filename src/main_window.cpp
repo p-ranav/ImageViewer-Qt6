@@ -240,7 +240,8 @@ void MainWindow::onImageLoaded(const QFileInfo &imageFileInfo,
                                const QPixmap &imagePixmap, int imageWidth,
                                int imageHeight) {
   // Set the resized image to the QLabel
-  imageViewer->setPixmap(imagePixmap, width() * 0.80, height() * 0.80);
+  imageViewer->setPixmap(imagePixmap, width() * SCALE_FACTOR,
+                         height() * SCALE_FACTOR);
 
   m_infoSidebar->setFilePosition(imageLoader->getHeaderLabel());
 
@@ -312,8 +313,8 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
-  auto desiredWidth = width() * 0.80;
-  auto desiredHeight = height() * 0.80;
+  auto desiredWidth = width() * SCALE_FACTOR;
+  auto desiredHeight = height() * SCALE_FACTOR;
   imageViewer->resize(desiredWidth, desiredHeight);
 
   QMainWindow::resizeEvent(event);
@@ -325,8 +326,8 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
     QPointF scenePos = imageViewer->mapToScene(event->pos());
     qDebug() << "Double click at scene coordinates:" << scenePos;
 
-    auto desiredWidth = width() * 0.80;
-    auto desiredHeight = height() * 0.80;
+    auto desiredWidth = width() * SCALE_FACTOR;
+    auto desiredHeight = height() * SCALE_FACTOR;
     imageViewer->resize(desiredWidth, desiredHeight);
   }
 

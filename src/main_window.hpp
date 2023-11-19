@@ -24,6 +24,8 @@
 class MainWindow : public QMainWindow {
   Q_OBJECT
 
+  static constexpr qreal SCALE_FACTOR = 0.90;
+
 public:
   MainWindow();
   ~MainWindow() = default;
