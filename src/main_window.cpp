@@ -38,6 +38,7 @@ MainWindow::MainWindow() : QMainWindow() {
 
   // Create an "Open" action
   QAction *openAction = new QAction("Open...", this);
+  openAction->setShortcut(QKeySequence("Ctrl+O"));
   connect(openAction, &QAction::triggered, this, &MainWindow::openImage);
 
   // Create a "Quick Export as a PNG" action
@@ -47,20 +48,24 @@ MainWindow::MainWindow() : QMainWindow() {
 
   // Create a "Copy to clipboard" action
   QAction *copyToClipboardAction = new QAction("Copy to clipboard", this);
+  copyToClipboardAction->setShortcut(QKeySequence("Ctrl+C"));
   connect(copyToClipboardAction, &QAction::triggered, this,
           &MainWindow::copyToClipboard);
 
   // Create a "Delete" action
   QAction *deleteAction = new QAction("Delete", this);
+  deleteAction->setShortcut(QKeySequence("Ctrl+D"));
   connect(deleteAction, &QAction::triggered, this,
           &MainWindow::confirmAndDeleteCurrentImage);
 
   // Create an "Zoom In" action
   QAction *zoomInAction = new QAction("Zoom In", this);
+  zoomInAction->setShortcut(QKeySequence("Ctrl++"));
   connect(zoomInAction, &QAction::triggered, this, &MainWindow::zoomIn);
 
   // Create an "Zoom Out" action
   QAction *zoomOutAction = new QAction("Zoom Out", this);
+  zoomOutAction->setShortcut(QKeySequence("Ctrl+-"));
   connect(zoomOutAction, &QAction::triggered, this, &MainWindow::zoomOut);
 
   // Add the "Open" action to the "File" menu
@@ -95,18 +100,11 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(m_rightArrowButton, &QPushButton::pressed,
           [this]() { emit nextImage(imageViewer->pixmap()); });
 
-  // Trash (Delete Image button)
-  m_trashButton = new QPushButton(this);
-  m_trashButton->setFixedSize(40, 40);
-  connect(m_trashButton, &QPushButton::pressed,
-          [this]() { confirmAndDeleteCurrentImage(); });
-
   // Create a layout and add buttons to it
   auto toolbarWidget = new QWidget(this);
   QHBoxLayout *buttonLayout = new QHBoxLayout();
   buttonLayout->addWidget(m_leftArrowButton);
   buttonLayout->addWidget(m_rightArrowButton);
-  buttonLayout->addWidget(m_trashButton);
   toolbarWidget->setLayout(buttonLayout);
 
   vstackLayout->addWidget(toolbarWidget, 0, Qt::AlignCenter);
@@ -117,7 +115,6 @@ MainWindow::MainWindow() : QMainWindow() {
       createColorIcon(":/images/left_arrow.png", iconColor, 24));
   m_rightArrowButton->setIcon(
       createColorIcon(":/images/right_arrow.png", iconColor, 24));
-  m_trashButton->setIcon(createColorIcon(":/images/trash.png", iconColor, 24));
 
   setCentralWidget(centralWidget);
 

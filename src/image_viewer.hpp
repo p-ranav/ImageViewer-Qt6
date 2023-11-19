@@ -25,9 +25,6 @@ signals:
     void copyRequested();
     void deleteRequested();
 
-private:
-  std::optional<QSize> getMainWindowSize() const;
-
 public:
   ImageViewer(QWidget *parent = nullptr);
   void setPixmap(const QPixmap &pixmap, int desiredWidth, int desiredHeight);
@@ -41,5 +38,4 @@ protected:
   bool event(QEvent *event) override;
   void wheelEvent(QWheelEvent *event) override;
   bool nativeGestureEvent(QNativeGestureEvent *event);
-  void contextMenuEvent(QContextMenuEvent* event) override;
 };

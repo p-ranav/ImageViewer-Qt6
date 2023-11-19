@@ -103,24 +103,3 @@ bool ImageViewer::nativeGestureEvent(QNativeGestureEvent *event) {
 
   return false;
 }
-
-void ImageViewer::contextMenuEvent(QContextMenuEvent *event) {
-  QMenu menu(this);
-  QAction *copyAction = menu.addAction("Copy");
-  QAction *deleteAction = menu.addAction("Delete");
-  QAction *selectedItem = menu.exec(event->globalPos());
-
-  if (selectedItem == copyAction) {
-    emit copyRequested();
-  } else if (selectedItem == deleteAction) {
-    emit deleteRequested();
-  }
-}
-
-std::optional<QSize> ImageViewer::getMainWindowSize() const {
-  // Get the QMainWindow size from the QGraphicsView
-  if (QMainWindow *mainWindow = qobject_cast<QMainWindow *>(parentWidget())) {
-    return mainWindow->size();
-  }
-  return std::nullopt;
-}

@@ -67,5 +67,4 @@ private:
 
   QPushButton *m_leftArrowButton;
   QPushButton *m_rightArrowButton;
-  QPushButton *m_trashButton;
 };
