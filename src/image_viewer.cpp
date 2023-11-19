@@ -7,7 +7,7 @@ ImageViewer::ImageViewer(QWidget *parent) : QGraphicsView(parent) {
   setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
   setResizeAnchor(QGraphicsView::AnchorViewCenter);
-  setStyleSheet("background: transparent");
+  setStyleSheet("background: transparent;");
 }
 
 void ImageViewer::setPixmap(const QPixmap &pixmap, int desiredWidth,

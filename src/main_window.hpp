@@ -19,6 +19,7 @@
 #include "image_viewer.hpp"
 #include <chrono>
 #include <iostream>
+#include "ExportWidget.hpp"
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -31,10 +32,12 @@ public:
 
 public slots:
   void openImage();
-  void quickExportAsPng();
   void copyToClipboard();
   void onImageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap, const ImageInfo& imageInfo);
   void onNoMoreImagesLeft();
+
+  void quickExportAsPng();
+  void exportAs();
 
 protected:
   bool event(QEvent* event) override;

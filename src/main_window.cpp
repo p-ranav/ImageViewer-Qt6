@@ -41,11 +41,6 @@ MainWindow::MainWindow() : QMainWindow() {
   openAction->setShortcut(QKeySequence("Ctrl+O"));
   connect(openAction, &QAction::triggered, this, &MainWindow::openImage);
 
-  // Create a "Quick Export as a PNG" action
-  QAction *quickExportAction = new QAction("Quick Export as a PNG", this);
-  connect(quickExportAction, &QAction::triggered, this,
-          &MainWindow::quickExportAsPng);
-
   // Create a "Copy to clipboard" action
   QAction *copyToClipboardAction = new QAction("Copy to clipboard", this);
   copyToClipboardAction->setShortcut(QKeySequence("Ctrl+C"));
@@ -57,6 +52,15 @@ MainWindow::MainWindow() : QMainWindow() {
   deleteAction->setShortcut(QKeySequence("Ctrl+D"));
   connect(deleteAction, &QAction::triggered, this,
           &MainWindow::confirmAndDeleteCurrentImage);
+
+  // Create a "Quick Export as a PNG" action
+  QAction *quickExportAction = new QAction("Quick Export as a PNG", this);
+  connect(quickExportAction, &QAction::triggered, this,
+          &MainWindow::quickExportAsPng);
+
+  // Create a "Quick Export as a PNG" action
+  QAction *exportAsAction = new QAction("Export As...", this);
+  connect(exportAsAction, &QAction::triggered, this, &MainWindow::exportAs);
 
   // Create an "Zoom In" action
   QAction *zoomInAction = new QAction("Zoom In", this);
@@ -70,9 +74,10 @@ MainWindow::MainWindow() : QMainWindow() {
 
   // Add the "Open" action to the "File" menu
   fileMenu->addAction(openAction);
-  fileMenu->addAction(quickExportAction);
   fileMenu->addAction(copyToClipboardAction);
   fileMenu->addAction(deleteAction);
+  fileMenu->addAction(quickExportAction);
+  fileMenu->addAction(exportAsAction);
   viewMenu->addAction(zoomInAction);
   viewMenu->addAction(zoomOutAction);
 
@@ -115,6 +120,8 @@ MainWindow::MainWindow() : QMainWindow() {
       createColorIcon(":/images/left_arrow.png", iconColor, 24));
   m_rightArrowButton->setIcon(
       createColorIcon(":/images/right_arrow.png", iconColor, 24));
+
+  centralWidget->setStyleSheet("background-color: rgb(25, 25, 25);");
 
   setCentralWidget(centralWidget);
 
@@ -179,6 +186,12 @@ void MainWindow::quickExportAsPng() {
   } else {
     qDebug() << "Error saving image";
   }
+}
+
+void MainWindow::exportAs() {
+  auto pixmapFullRes = imageLoader->getCurrentImageFullRes();
+  auto *exportWidget = new ExportWidget(pixmapFullRes);
+  exportWidget->show();
 }
 
 void MainWindow::copyToClipboard() {
