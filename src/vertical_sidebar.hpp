@@ -11,12 +11,13 @@ class VerticalSidebar : public QWidget {
 	QLabel* imageResolutionValue;
 public:
     VerticalSidebar(QWidget *parent = nullptr) : QWidget(parent) {
+		setWindowTitle("More info");
         QVBoxLayout *mainLayout = new QVBoxLayout(this);
         mainLayout->setContentsMargins(20, 20, 20, 20); // Set margins on all sides
 
 		filePositionHeader = new QLabel("1/5");
 		filePositionHeader->setAttribute(Qt::WA_TranslucentBackground);
-		mainLayout->addWidget(filePositionHeader, 0, Qt::AlignCenter);
+		// mainLayout->addWidget(filePositionHeader, 0, Qt::AlignCenter);
 
         QFormLayout *layout = new QFormLayout();
         layout->setLabelAlignment(Qt::AlignLeft);
