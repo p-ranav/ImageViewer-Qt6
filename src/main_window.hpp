@@ -19,7 +19,8 @@
 #include "image_viewer.hpp"
 #include <chrono>
 #include <iostream>
-#include "ExportWidget.hpp"
+#include <atomic>
+#include "IconHelper.hpp"
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -37,10 +38,8 @@ public slots:
   void onNoMoreImagesLeft();
 
   void quickExportAsPng();
-  void exportAs();
 
 protected:
-  bool event(QEvent* event) override;
   void closeEvent(QCloseEvent *event) override;
   void resizeEvent(QResizeEvent* event) override;
   void mouseDoubleClickEvent(QMouseEvent *event) override;
@@ -56,8 +55,9 @@ signals:
 private:
   void zoomIn();
   void zoomOut();
-  static QIcon createColorIcon(const QString &imagePath, const QColor &color, int size);
   void confirmAndDeleteCurrentImage();
+  void toggleFullScreen();
+  qreal getScaleFactor() const;
 
 private:
   QLabel canvasLabel;
@@ -68,6 +68,10 @@ private:
   bool m_sidebarVisible{false};
   ImageViewer *imageViewer;
 
+  QWidget* m_toolbarWidget;
   QPushButton *m_leftArrowButton;
   QPushButton *m_rightArrowButton;
+
+  QWidget * m_centralWidget;
+  std::atomic<bool> m_fullScreen{false};
 };

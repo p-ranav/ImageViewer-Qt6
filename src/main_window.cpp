@@ -58,10 +58,6 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(quickExportAction, &QAction::triggered, this,
           &MainWindow::quickExportAsPng);
 
-  // Create a "Quick Export as a PNG" action
-  QAction *exportAsAction = new QAction("Export As...", this);
-  connect(exportAsAction, &QAction::triggered, this, &MainWindow::exportAs);
-
   // Create an "Zoom In" action
   QAction *zoomInAction = new QAction("Zoom In", this);
   zoomInAction->setShortcut(QKeySequence("Ctrl++"));
@@ -72,14 +68,35 @@ MainWindow::MainWindow() : QMainWindow() {
   zoomOutAction->setShortcut(QKeySequence("Ctrl+-"));
   connect(zoomOutAction, &QAction::triggered, this, &MainWindow::zoomOut);
 
+  QAction *previousImageAction = new QAction("Previous Image", this);
+  previousImageAction->setShortcut(QKeySequence("Ctrl+P"));
+  connect(previousImageAction, &QAction::triggered, this,
+          [this]() { emit previousImage(imageViewer->pixmap()); });
+
+  QAction *nextImageAction = new QAction("Next Image", this);
+  nextImageAction->setShortcut(QKeySequence("Ctrl+N"));
+  connect(nextImageAction, &QAction::triggered, this,
+          [this]() { emit nextImage(imageViewer->pixmap()); });
+
+  // Create an "Zen mode" action
+  QAction *zenModeAction = new QAction("Toggle Zen Mode", this);
+  zenModeAction->setShortcut(QKeySequence("Ctrl+Z"));
+  connect(zenModeAction, &QAction::triggered, this,
+          &MainWindow::toggleFullScreen);
+
   // Add the "Open" action to the "File" menu
   fileMenu->addAction(openAction);
   fileMenu->addAction(copyToClipboardAction);
   fileMenu->addAction(deleteAction);
+  fileMenu->addSeparator();
   fileMenu->addAction(quickExportAction);
-  fileMenu->addAction(exportAsAction);
   viewMenu->addAction(zoomInAction);
   viewMenu->addAction(zoomOutAction);
+  viewMenu->addSeparator();
+  viewMenu->addAction(previousImageAction);
+  viewMenu->addAction(nextImageAction);
+  viewMenu->addSeparator();
+  viewMenu->addAction(zenModeAction);
 
   // Create a imageViewer to display the image
   imageViewer = new ImageViewer(this);
@@ -88,31 +105,33 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(imageViewer, &ImageViewer::deleteRequested, this,
           &MainWindow::deleteCurrentImage);
 
-  auto centralWidget = new QWidget(this);
+  m_centralWidget = new QWidget(this);
   auto vstackLayout = new QVBoxLayout();
   vstackLayout->addWidget(imageViewer);
-  centralWidget->setLayout(vstackLayout);
+  m_centralWidget->setLayout(vstackLayout);
 
   // Left Arrow (Previous Image button)
   m_leftArrowButton = new QPushButton(this);
   m_leftArrowButton->setFixedSize(40, 40);
   connect(m_leftArrowButton, &QPushButton::pressed,
           [this]() { emit previousImage(imageViewer->pixmap()); });
+  m_leftArrowButton->setStyleSheet("background: transparent;");
 
   // Right Arrow (Next Image button)
   m_rightArrowButton = new QPushButton(this);
   m_rightArrowButton->setFixedSize(40, 40);
   connect(m_rightArrowButton, &QPushButton::pressed,
           [this]() { emit nextImage(imageViewer->pixmap()); });
+  m_rightArrowButton->setStyleSheet("background: transparent;");
 
   // Create a layout and add buttons to it
-  auto toolbarWidget = new QWidget(this);
+  m_toolbarWidget = new QWidget(this);
   QHBoxLayout *buttonLayout = new QHBoxLayout();
   buttonLayout->addWidget(m_leftArrowButton);
   buttonLayout->addWidget(m_rightArrowButton);
-  toolbarWidget->setLayout(buttonLayout);
+  m_toolbarWidget->setLayout(buttonLayout);
 
-  vstackLayout->addWidget(toolbarWidget, 0, Qt::AlignCenter);
+  vstackLayout->addWidget(m_toolbarWidget, 0, Qt::AlignCenter);
 
   // Set the icon with a specific color
   QColor iconColor(Qt::white); // Set your desired color
@@ -121,24 +140,12 @@ MainWindow::MainWindow() : QMainWindow() {
   m_rightArrowButton->setIcon(
       createColorIcon(":/images/right_arrow.png", iconColor, 24));
 
-  centralWidget->setStyleSheet("background-color: rgb(25, 25, 25);");
+  m_centralWidget->setStyleSheet(
+      "background-color: rgb(25, 25, 25); padding: 0px;");
 
-  setCentralWidget(centralWidget);
+  setCentralWidget(m_centralWidget);
 
   openImage();
-}
-
-QIcon MainWindow::createColorIcon(const QString &imagePath, const QColor &color,
-                                  int size) {
-  QPixmap pixmap(imagePath);
-  pixmap =
-      pixmap.scaled(size, size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-
-  QPainter painter(&pixmap);
-  painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
-  painter.fillRect(pixmap.rect(), color);
-
-  return QIcon(pixmap);
 }
 
 void MainWindow::openImage() {
@@ -188,12 +195,6 @@ void MainWindow::quickExportAsPng() {
   }
 }
 
-void MainWindow::exportAs() {
-  auto pixmapFullRes = imageLoader->getCurrentImageFullRes();
-  auto *exportWidget = new ExportWidget(pixmapFullRes);
-  exportWidget->show();
-}
-
 void MainWindow::copyToClipboard() {
   const auto pixmapFullRes = imageLoader->getCurrentImageFullRes();
   QClipboard *clipboard = QGuiApplication::clipboard();
@@ -203,8 +204,8 @@ void MainWindow::copyToClipboard() {
 void MainWindow::onImageLoaded(const QFileInfo &, const QPixmap &imagePixmap,
                                const ImageInfo &) {
   // Set the resized image to the QLabel
-  imageViewer->setPixmap(imagePixmap, width() * SCALE_FACTOR,
-                         height() * SCALE_FACTOR);
+  imageViewer->setPixmap(imagePixmap, width() * getScaleFactor(),
+                         height() * getScaleFactor());
 }
 
 void MainWindow::onNoMoreImagesLeft() {
@@ -229,27 +230,6 @@ void MainWindow::confirmAndDeleteCurrentImage() {
   }
 }
 
-bool MainWindow::event(QEvent *event) {
-  if (event->type() == QEvent::KeyPress) {
-    // Handle the key press event here
-    QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-    Qt::Key key = static_cast<Qt::Key>(keyEvent->key());
-
-    if ((key == Qt::Key_N || key == Qt::Key_Right)/* &&
-        modifiers == Qt::NoModifier*/) {
-      emit nextImage(imageViewer->pixmap());
-      return true; // Event handled
-    } else if ((key == Qt::Key_P || key == Qt::Key_Left)/* &&
-               modifiers == Qt::NoModifier*/) {
-      emit previousImage(imageViewer->pixmap());
-      return true; // Event handled
-    }
-  }
-
-  // Call the base class implementation for other events
-  return QMainWindow::event(event);
-}
-
 void MainWindow::closeEvent(QCloseEvent *event) {
   // Clean up the thread when the main window is closed
   imageLoaderThread->quit();
@@ -258,8 +238,8 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
-  auto desiredWidth = width() * SCALE_FACTOR;
-  auto desiredHeight = height() * SCALE_FACTOR;
+  auto desiredWidth = width() * getScaleFactor();
+  auto desiredHeight = height() * getScaleFactor();
   imageViewer->resize(desiredWidth, desiredHeight);
 
   QMainWindow::resizeEvent(event);
@@ -271,8 +251,8 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
     QPointF scenePos = imageViewer->mapToScene(event->pos());
     qDebug() << "Double click at scene coordinates:" << scenePos;
 
-    auto desiredWidth = width() * SCALE_FACTOR;
-    auto desiredHeight = height() * SCALE_FACTOR;
+    auto desiredWidth = width() * getScaleFactor();
+    auto desiredHeight = height() * getScaleFactor();
     imageViewer->resize(desiredWidth, desiredHeight);
   }
 
@@ -283,3 +263,32 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
 void MainWindow::zoomIn() { imageViewer->zoomIn(); }
 
 void MainWindow::zoomOut() { imageViewer->zoomOut(); }
+
+void MainWindow::toggleFullScreen() {
+
+  if (m_fullScreen) {
+    m_fullScreen = false;
+
+    imageViewer->setPixmap(imageViewer->pixmap(), width() * getScaleFactor(),
+                           height() * getScaleFactor());
+
+    showNormal();
+    m_toolbarWidget->show();
+
+  } else {
+    m_fullScreen = true;
+    imageViewer->setPixmap(imageViewer->pixmap(), width() * getScaleFactor(),
+                           height() * getScaleFactor());
+
+    m_toolbarWidget->hide();
+    showFullScreen();
+  }
+}
+
+qreal MainWindow::getScaleFactor() const {
+  if (m_fullScreen) {
+    return 1;
+  } else {
+    return SCALE_FACTOR;
+  }
+}

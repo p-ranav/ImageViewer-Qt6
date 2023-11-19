@@ -8,5 +8,6 @@
         <file alias="images/info.png">images/info.png</file>
         <file alias="images/forward_10.png">images/forward_10.png</file>
         <file alias="images/backward_10.png">images/backward_10.png</file>
+        <file alias="images/undo.png">images/undo.png</file>
     </qresource>
 </RCC>
