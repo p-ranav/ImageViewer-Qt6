@@ -45,6 +45,16 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(quickExportAction, &QAction::triggered, this,
           &MainWindow::quickExportAsPng);
 
+  // Create a "Copy to clipboard" action
+  QAction *copyToClipboardAction = new QAction("Copy to clipboard", this);
+  connect(copyToClipboardAction, &QAction::triggered, this,
+          &MainWindow::copyToClipboard);
+
+  // Create a "Delete" action
+  QAction *deleteAction = new QAction("Delete", this);
+  connect(deleteAction, &QAction::triggered, this,
+          &MainWindow::confirmAndDeleteCurrentImage);
+
   // Create an "Zoom In" action
   QAction *zoomInAction = new QAction("Zoom In", this);
   connect(zoomInAction, &QAction::triggered, this, &MainWindow::zoomIn);
@@ -56,6 +66,8 @@ MainWindow::MainWindow() : QMainWindow() {
   // Add the "Open" action to the "File" menu
   fileMenu->addAction(openAction);
   fileMenu->addAction(quickExportAction);
+  fileMenu->addAction(copyToClipboardAction);
+  fileMenu->addAction(deleteAction);
   viewMenu->addAction(zoomInAction);
   viewMenu->addAction(zoomOutAction);
 
