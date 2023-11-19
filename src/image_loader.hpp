@@ -13,6 +13,8 @@
 #include <QDir>
 #include <QFile>
 #include <libexif/exif-data.h>
+#include "image_info.hpp"
+#include <QColorSpace>
 
 class ImageLoader : public QObject {
   Q_OBJECT
@@ -22,21 +24,17 @@ class ImageLoader : public QObject {
   std::vector<std::string> m_imageFilePaths;
   std::size_t m_currentIndex{0};
 
-  int m_previousImageWidth;
-  int m_previousImageHeight;
   QPixmap m_previousPixmap;
-  
-  int m_nextImageWidth;
-  int m_nextImageHeight;
   QPixmap m_nextPixmap;
 
-  int m_currentImageWidth;
-  int m_currentImageHeight;
+  ImageInfo m_currentImageInfo;
+  ImageInfo m_previousImageInfo;
+  ImageInfo m_nextImageInfo;
 
   void loadImagePathsIfEmpty(const char* directory, const char* current_file);
-  void loadRaw(const QString &imagePath, QPixmap& imagePixmap, bool half_size, int& width, int& height);
-  void loadWithImageReader(const QString &imagePath, QPixmap& imagePixmap, int& width, int& height);
-  void loadImageIntoPixmap(const QString &imagePath, QPixmap& imagePixmap, bool half_size, int& width, int& height);
+  ImageInfo loadRaw(const QString &imagePath, QPixmap& imagePixmap, bool half_size);
+  ImageInfo loadWithImageReader(const QString &imagePath, QPixmap& imagePixmap);
+  ImageInfo loadImageIntoPixmap(const QString &imagePath, QPixmap& imagePixmap, bool half_size);
 
 public:
   ImageLoader();
@@ -56,6 +54,6 @@ public slots:
   void deleteCurrentImage();
 
 signals:
-  void imageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap, int imageWidth, int imageHeight);
+  void imageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap, const ImageInfo& imageInfo);
   void noMoreImagesLeft();
 };

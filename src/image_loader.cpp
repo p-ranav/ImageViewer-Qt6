@@ -52,8 +52,11 @@ void ImageLoader::loadImagePathsIfEmpty(const char *directory,
   }
 }
 
-void ImageLoader::loadRaw(const QString &imagePath, QPixmap &imagePixmap,
-                          bool half_size, int &width, int &height) {
+ImageInfo ImageLoader::loadRaw(const QString &imagePath, QPixmap &imagePixmap,
+                               bool half_size) {
+
+  ImageInfo result;
+
   m_rawProcessor.open_file(imagePath.toLocal8Bit().data());
 
   m_rawProcessor.imgdata.params.half_size = half_size ? 1 : 0;
@@ -62,9 +65,8 @@ void ImageLoader::loadRaw(const QString &imagePath, QPixmap &imagePixmap,
   m_rawProcessor.dcraw_process();
 
   // Access the image resolution
-  width = m_rawProcessor.imgdata.sizes.raw_width;
-  height = m_rawProcessor.imgdata.sizes.raw_height;
-  std::cout << width << " x " << height << "\n";
+  result.width = m_rawProcessor.imgdata.sizes.raw_width;
+  result.height = m_rawProcessor.imgdata.sizes.raw_height;
 
   libraw_processed_image_t *processed_image =
       m_rawProcessor.dcraw_make_mem_image();
@@ -80,11 +82,15 @@ void ImageLoader::loadRaw(const QString &imagePath, QPixmap &imagePixmap,
   imagePixmap = QPixmap::fromImage(image);
 
   m_rawProcessor.dcraw_clear_mem(processed_image);
+
+  return result;
 }
 
-void ImageLoader::loadWithImageReader(const QString &imagePath,
-                                      QPixmap &imagePixmap, int &width,
-                                      int &height) {
+ImageInfo ImageLoader::loadWithImageReader(const QString &imagePath,
+                                           QPixmap &imagePixmap) {
+
+  ImageInfo result;
+
   QImageReader imageReader(imagePath);
   imageReader.setAllocationLimit(0);
   imageReader.setAutoTransform(true);
@@ -93,26 +99,27 @@ void ImageLoader::loadWithImageReader(const QString &imagePath,
   if (image.isNull()) {
     /// TODO: Show warning message
     // QMessageBox::warning(this, "Error", "Failed to open the image.");
-    return;
+  } else {
+    imagePixmap = QPixmap::fromImage(image);
+    result.width = imagePixmap.width();
+    result.height = imagePixmap.height();
   }
 
-  imagePixmap = QPixmap::fromImage(image);
-  width = imagePixmap.width();
-  height = imagePixmap.height();
+  return result;
 }
 
-void ImageLoader::loadImageIntoPixmap(const QString &imagePath,
-                                      QPixmap &imagePixmap, bool half_size,
-                                      int &width, int &height) {
+ImageInfo ImageLoader::loadImageIntoPixmap(const QString &imagePath,
+                                           QPixmap &imagePixmap,
+                                           bool half_size) {
   QFileInfo fileInfo(imagePath);
 
   QStringList rawFormats = {"nef", "cr2", "arw", "dng", "orf",
                             "pef", "rw2", "srw", "crw", "raf"};
 
   if (rawFormats.contains(fileInfo.suffix().toLower())) {
-    loadRaw(imagePath, imagePixmap, half_size, width, height);
+    return loadRaw(imagePath, imagePixmap, half_size);
   } else {
-    loadWithImageReader(imagePath, imagePixmap, width, height);
+    return loadWithImageReader(imagePath, imagePixmap);
   }
 }
 
@@ -128,22 +135,20 @@ void ImageLoader::loadImage(const QString &imagePath) {
 
   loadImagePathsIfEmpty(fileInfo.dir().absolutePath().toLocal8Bit().data(),
                         fileInfo.absoluteFilePath().toLocal8Bit().data());
-  loadImageIntoPixmap(imagePath, imagePixmap, true, m_currentImageWidth,
-                      m_currentImageHeight);
+  m_currentImageInfo = loadImageIntoPixmap(imagePath, imagePixmap, true);
 
-  emit imageLoaded(fileInfo, imagePixmap, m_currentImageWidth,
-                   m_currentImageHeight);
+  emit imageLoaded(fileInfo, imagePixmap, m_currentImageInfo);
 
   // Prefetch next and previous images
   if (m_currentIndex >= 1) {
-    loadImageIntoPixmap(
+    m_previousImageInfo = loadImageIntoPixmap(
         QString::fromStdString(m_imageFilePaths[m_currentIndex - 1]),
-        m_previousPixmap, true, m_previousImageWidth, m_previousImageHeight);
+        m_previousPixmap, true);
   }
   if (m_currentIndex + 1 < m_imageFilePaths.size()) {
-    loadImageIntoPixmap(
+    m_nextImageInfo = loadImageIntoPixmap(
         QString::fromStdString(m_imageFilePaths[m_currentIndex + 1]),
-        m_nextPixmap, true, m_nextImageWidth, m_nextImageHeight);
+        m_nextPixmap, true);
   }
 }
 
@@ -168,20 +173,16 @@ void ImageLoader::previousImage(const QPixmap &currentPixmap) {
         QString::fromStdString(m_imageFilePaths[m_currentIndex - 1]));
 
     m_nextPixmap = currentPixmap;
-    m_nextImageWidth = m_currentImageWidth;
-    m_nextImageHeight = m_currentImageHeight;
-
-    m_currentImageWidth = m_previousImageWidth;
-    m_currentImageHeight = m_previousImageHeight;
+    m_nextImageInfo = m_currentImageInfo;
+    m_currentImageInfo = m_previousImageInfo;
 
     m_currentIndex -= 1;
 
-    emit imageLoaded(fileInfo, m_previousPixmap, m_previousImageWidth,
-                     m_previousImageHeight);
+    emit imageLoaded(fileInfo, m_previousPixmap, m_previousImageInfo);
 
-    loadImageIntoPixmap(
+    m_previousImageInfo = loadImageIntoPixmap(
         QString::fromStdString(m_imageFilePaths[m_currentIndex - 1]),
-        m_previousPixmap, true, m_previousImageWidth, m_previousImageHeight);
+        m_previousPixmap, true);
   }
 }
 
@@ -197,21 +198,17 @@ void ImageLoader::nextImage(const QPixmap &currentPixmap) {
         QString::fromStdString(m_imageFilePaths[m_currentIndex + 1]));
 
     m_previousPixmap = currentPixmap;
-    m_previousImageWidth = m_currentImageWidth;
-    m_previousImageHeight = m_currentImageHeight;
-
-    m_currentImageWidth = m_nextImageWidth;
-    m_currentImageHeight = m_nextImageHeight;
+    m_previousImageInfo = m_currentImageInfo;
+    m_currentImageInfo = m_nextImageInfo;
 
     m_currentIndex += 1;
 
-    emit imageLoaded(fileInfo, m_nextPixmap, m_nextImageWidth,
-                     m_nextImageHeight);
+    emit imageLoaded(fileInfo, m_nextPixmap, m_nextImageInfo);
 
     if (m_currentIndex + 1 < m_imageFilePaths.size()) {
-      loadImageIntoPixmap(
+      m_nextImageInfo = loadImageIntoPixmap(
           QString::fromStdString(m_imageFilePaths[m_currentIndex + 1]),
-          m_nextPixmap, true, m_nextImageWidth, m_nextImageHeight);
+          m_nextPixmap, true);
     }
   }
 }
@@ -236,8 +233,8 @@ QPixmap ImageLoader::getCurrentImageFullRes() {
   auto imagePath = m_imageFilePaths[m_currentIndex];
 
   QPixmap imagePixmap;
-  loadImageIntoPixmap(QString::fromStdString(imagePath), imagePixmap, false,
-                      m_currentImageWidth, m_currentImageHeight);
+  m_currentImageInfo = loadImageIntoPixmap(QString::fromStdString(imagePath),
+                                           imagePixmap, false);
 
   return imagePixmap;
 }
@@ -272,17 +269,15 @@ void ImageLoader::deleteCurrentImage() {
         QString::fromStdString(m_imageFilePaths[m_currentIndex]));
 
     // Emit nextPixmap as current pixmap
-    emit imageLoaded(fileInfo, m_nextPixmap, m_nextImageWidth,
-                     m_nextImageHeight);
+    emit imageLoaded(fileInfo, m_nextPixmap, m_nextImageInfo);
 
-    m_currentImageWidth = m_nextImageWidth;
-    m_currentImageHeight = m_nextImageHeight;
+    m_currentImageInfo = m_nextImageInfo;
 
     if (m_currentIndex + 1 < m_imageFilePaths.size()) {
       // Prefetch load a new image into nextPixmap
-      loadImageIntoPixmap(
+      m_nextImageInfo = loadImageIntoPixmap(
           QString::fromStdString(m_imageFilePaths[m_currentIndex + 1]),
-          m_nextPixmap, true, m_nextImageWidth, m_nextImageHeight);
+          m_nextPixmap, true);
     }
   } else if (m_imageFilePaths.size() > 0) {
     /// Previous condition was not true
@@ -298,16 +293,14 @@ void ImageLoader::deleteCurrentImage() {
         QString::fromStdString(m_imageFilePaths[m_currentIndex]));
 
     // Emit previousPixmap as current pixmap
-    emit imageLoaded(fileInfo, m_previousPixmap, m_previousImageWidth,
-                     m_previousImageHeight);
+    emit imageLoaded(fileInfo, m_previousPixmap, m_previousImageInfo);
 
-    m_currentImageWidth = m_previousImageWidth;
-    m_currentImageHeight = m_previousImageHeight;
+    m_currentImageInfo = m_previousImageInfo;
 
     // Prefetch load a new image into previousPixmap
-    loadImageIntoPixmap(
+    m_previousImageInfo = loadImageIntoPixmap(
         QString::fromStdString(m_imageFilePaths[m_currentIndex - 1]),
-        m_previousPixmap, true, m_previousImageWidth, m_previousImageHeight);
+        m_previousPixmap, true);
 
   } else {
     emit noMoreImagesLeft();

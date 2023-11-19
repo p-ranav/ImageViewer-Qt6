@@ -66,26 +66,10 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(imageViewer, &ImageViewer::deleteRequested, this,
           &MainWindow::deleteCurrentImage);
 
-  m_infoSidebar = new VerticalSidebar();
-  m_infoSidebar->hide();
-
   auto centralWidget = new QWidget(this);
   auto vstackLayout = new QVBoxLayout();
   vstackLayout->addWidget(imageViewer);
   centralWidget->setLayout(vstackLayout);
-
-  // Info (Image Info button)
-  m_infoButton = new QPushButton(this);
-  m_infoButton->setFixedSize(40, 40);
-  connect(m_infoButton, &QPushButton::pressed, [this]() {
-    if (!m_sidebarVisible) {
-      m_infoSidebar->show();
-      m_sidebarVisible = true;
-    } else {
-      m_infoSidebar->hide();
-      m_sidebarVisible = false;
-    }
-  });
 
   // Left Arrow (Previous Image button)
   m_leftArrowButton = new QPushButton(this);
@@ -108,7 +92,6 @@ MainWindow::MainWindow() : QMainWindow() {
   // Create a layout and add buttons to it
   auto toolbarWidget = new QWidget(this);
   QHBoxLayout *buttonLayout = new QHBoxLayout();
-  buttonLayout->addWidget(m_infoButton);
   buttonLayout->addWidget(m_leftArrowButton);
   buttonLayout->addWidget(m_rightArrowButton);
   buttonLayout->addWidget(m_trashButton);
@@ -118,7 +101,6 @@ MainWindow::MainWindow() : QMainWindow() {
 
   // Set the icon with a specific color
   QColor iconColor(Qt::white); // Set your desired color
-  m_infoButton->setIcon(createColorIcon(":/images/info.png", iconColor, 24));
   m_leftArrowButton->setIcon(
       createColorIcon(":/images/left_arrow.png", iconColor, 24));
   m_rightArrowButton->setIcon(
@@ -158,7 +140,6 @@ void MainWindow::openImage() {
     emit loadImage(imagePath);
 
     QFileInfo fileInfo(imagePath);
-    m_infoSidebar->setFileName(fileInfo.fileName());
   }
 }
 
@@ -197,75 +178,17 @@ void MainWindow::copyToClipboard() {
   clipboard->setPixmap(pixmapFullRes);
 }
 
-QString prettyPrintSize(qint64 size) {
-  const qint64 kb = 1024;
-  const qint64 mb = kb * 1024;
-  const qint64 gb = mb * 1024;
-
-  if (size < kb) {
-    return QString("%1 bytes").arg(size);
-  } else if (size < mb) {
-    return QString("%1 KB (%2 bytes)")
-        .arg(size / kb)
-        .arg(QLocale().toString(size));
-  } else if (size < gb) {
-    return QString("%1 MB (%2 bytes)")
-        .arg(size / mb)
-        .arg(QLocale().toString(size));
-  } else {
-    return QString("%1 GB (%2 bytes)")
-        .arg(size / gb)
-        .arg(QLocale().toString(size));
-  }
-}
-
-QString getDocumentType(const QFileInfo &fileInfo) {
-  QString extension = fileInfo.suffix().toLower();
-
-  if (extension.isEmpty()) {
-    return "Unknown Type";
-  } else if (extension == "png" || extension == "jpg" || extension == "jpeg" ||
-             extension == "gif") {
-    return "Image File";
-  } else if (extension == "webp") {
-    return "WebP Image";
-  } else if (extension == "nef") {
-    return "Nikon RAW Image";
-  } else {
-    return "Unknown Type";
-  }
-}
-
-void MainWindow::onImageLoaded(const QFileInfo &imageFileInfo,
-                               const QPixmap &imagePixmap, int imageWidth,
-                               int imageHeight) {
+void MainWindow::onImageLoaded(const QFileInfo &, const QPixmap &imagePixmap,
+                               const ImageInfo &) {
   // Set the resized image to the QLabel
   imageViewer->setPixmap(imagePixmap, width() * SCALE_FACTOR,
                          height() * SCALE_FACTOR);
-
-  m_infoSidebar->setFilePosition(imageLoader->getHeaderLabel());
-
-  m_infoSidebar->setFileName(imageFileInfo.fileName());
-
-  qint64 fileSize = imageFileInfo.size();
-  QString prettySize = prettyPrintSize(fileSize);
-  m_infoSidebar->setFileSize(prettySize);
-
-  const auto documentType = getDocumentType(imageFileInfo);
-  m_infoSidebar->setFileType(documentType);
-
-  const auto imageResolution =
-      QString("%1 x %2").arg(imageWidth).arg(imageHeight);
-  m_infoSidebar->setImageResolution(imageResolution);
 }
 
 void MainWindow::onNoMoreImagesLeft() {
   auto emptyImage = QImage(0, 0, QImage::Format_ARGB32);
   auto emptyPixmap = QPixmap::fromImage(emptyImage);
   imageViewer->setPixmap(emptyPixmap, 0, 0);
-  m_infoSidebar->setFileName("");
-  m_infoSidebar->setFileSize("");
-  m_infoSidebar->setFileType("");
 }
 
 void MainWindow::confirmAndDeleteCurrentImage() {
