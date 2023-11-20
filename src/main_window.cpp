@@ -68,6 +68,16 @@ MainWindow::MainWindow() : QMainWindow() {
   zoomOutAction->setShortcut(QKeySequence("Ctrl+-"));
   connect(zoomOutAction, &QAction::triggered, this, &MainWindow::zoomOut);
 
+  // Create an "Slideshow" action
+  QAction *slideshowAction = new QAction("Slideshow", this);
+  connect(slideshowAction, &QAction::triggered, this,
+          &MainWindow::startSlideshow);
+
+  slideshowTimer = new QTimer(this);
+  slideshowTimer->setInterval(m_timerIntervalMs);
+  connect(slideshowTimer, &QTimer::timeout, this,
+          &MainWindow::slideshowTimerCallback);
+
   // Create an "Zen mode" action
   QAction *zenModeAction = new QAction("Toggle Zen Mode", this);
   zenModeAction->setShortcut(QKeySequence("Ctrl+Z"));
@@ -83,6 +93,7 @@ MainWindow::MainWindow() : QMainWindow() {
   viewMenu->addAction(zoomInAction);
   viewMenu->addAction(zoomOutAction);
   viewMenu->addSeparator();
+  viewMenu->addAction(slideshowAction);
   viewMenu->addAction(zenModeAction);
 
   // Create a imageViewer to display the image
@@ -271,6 +282,12 @@ void MainWindow::zoomIn() { imageViewer->zoomIn(); }
 
 void MainWindow::zoomOut() { imageViewer->zoomOut(); }
 
+void MainWindow::slideshowTimerCallback() {
+  emit nextImage(imageViewer->pixmap());
+}
+
+void MainWindow::startSlideshow() { slideshowTimer->start(); }
+
 void MainWindow::toggleFullScreen() {
 
   if (m_fullScreen) {
@@ -301,6 +318,16 @@ qreal MainWindow::getScaleFactor() const {
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
+
+  if (slideshowTimer->isActive()) {
+    slideshowTimer->stop();
+    /// TODO: Add reachedEnd signal to stop slideshow
+    /// when no more images left
+    ///
+    /// this can also be used to restart the slidehow from
+    /// the start
+  }
+
   switch (event->key()) {
   case Qt::Key_Up:
     /// std::cout << "UP\n";

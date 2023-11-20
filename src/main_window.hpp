@@ -56,6 +56,8 @@ signals:
 private:
   void zoomIn();
   void zoomOut();
+  void slideshowTimerCallback();
+  void startSlideshow();
   void confirmAndDeleteCurrentImage();
   void toggleFullScreen();
   qreal getScaleFactor() const;
@@ -79,4 +81,7 @@ private:
 
   QWidget * m_centralWidget;
   std::atomic<bool> m_fullScreen{false};
+
+  QTimer *slideshowTimer;
+  constexpr static inline int m_timerIntervalMs{2500};
 };
