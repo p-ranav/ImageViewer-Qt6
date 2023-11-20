@@ -34,6 +34,7 @@ public:
 public slots:
   void openImage();
   void copyToClipboard();
+  void copyToLocation();
   void onImageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap, const ImageInfo& imageInfo);
   void onNoMoreImagesLeft();
 

@@ -47,6 +47,11 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(copyToClipboardAction, &QAction::triggered, this,
           &MainWindow::copyToClipboard);
 
+  // Create a "Copy to..." action
+  QAction *copyToLocationAction = new QAction("Copy to...", this);
+  connect(copyToLocationAction, &QAction::triggered, this,
+          &MainWindow::copyToLocation);
+
   // Create a "Delete" action
   QAction *deleteAction = new QAction("Delete", this);
   deleteAction->setShortcut(QKeySequence("Ctrl+D"));
@@ -87,6 +92,7 @@ MainWindow::MainWindow() : QMainWindow() {
   // Add the "Open" action to the "File" menu
   fileMenu->addAction(openAction);
   fileMenu->addAction(copyToClipboardAction);
+  fileMenu->addAction(copyToLocationAction);
   fileMenu->addAction(deleteAction);
   fileMenu->addSeparator();
   fileMenu->addAction(quickExportAction);
@@ -198,6 +204,40 @@ void MainWindow::copyToClipboard() {
   const auto pixmapFullRes = imageLoader->getCurrentImageFullRes();
   QClipboard *clipboard = QGuiApplication::clipboard();
   clipboard->setPixmap(pixmapFullRes);
+}
+
+void MainWindow::copyToLocation() {
+  auto currentFilePath = imageLoader->getCurrentImageFilePath();
+
+  QFileInfo currentFileInfo(currentFilePath);
+  QFile sourceFile(currentFilePath);
+  if (!sourceFile.open(QIODevice::ReadOnly)) {
+    qWarning() << "Failed to open source file:" << sourceFile.errorString();
+    return;
+  }
+
+  QString destinationFilePath = QFileDialog::getSaveFileName(
+      this, tr("Save Image"), currentFileInfo.fileName(),
+      tr("Images (*.png *.jpg *.bmp);;All Files (*)"));
+  if (!destinationFilePath.isEmpty()) {
+
+    // Open the destination file for writing
+    QFile destinationFile(destinationFilePath);
+    if (!destinationFile.open(QIODevice::WriteOnly)) {
+      qWarning() << "Failed to open destination file:"
+                 << destinationFile.errorString();
+      sourceFile.close(); // Close the source file before returning
+      return;
+    }
+
+    // Copy the contents of the source file to the destination file
+    QByteArray data = sourceFile.readAll();
+    destinationFile.write(data);
+
+    // Close both files
+    sourceFile.close();
+    destinationFile.close();
+  }
 }
 
 void MainWindow::onImageLoaded(const QFileInfo &fileInfo,
