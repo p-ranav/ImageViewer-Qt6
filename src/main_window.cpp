@@ -244,6 +244,10 @@ void MainWindow::confirmAndDeleteCurrentImage() {
       this, "Delete Confirmation", "Do you really want to delete this item?",
       QMessageBox::Yes | QMessageBox::No);
 
+  grabKeyboard();
+  setFocus();
+  activateWindow();
+
   // Check the user's response
   if (reply == QMessageBox::Yes) {
     emit deleteCurrentImage();
