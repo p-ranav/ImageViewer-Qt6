@@ -206,6 +206,16 @@ void MainWindow::copyToClipboard() {
   clipboard->setPixmap(pixmapFullRes);
 }
 
+QString getLastDestination() {
+  QSettings settings("p-ranav", "ImageViewer");
+  return settings.value("lastCopyDestination", QDir::homePath()).toString();
+}
+
+void setLastDestination(const QString &path) {
+  QSettings settings("p-ranav", "ImageViewer");
+  settings.setValue("lastCopyDestination", path);
+}
+
 void MainWindow::copyToLocation() {
   auto currentFilePath = imageLoader->getCurrentImageFilePath();
 
@@ -216,8 +226,13 @@ void MainWindow::copyToLocation() {
     return;
   }
 
+  QString lastUsedDestination = getLastDestination();
+  QDir candidateDir(lastUsedDestination);
+  QFileInfo candidateFileInfo(candidateDir, currentFileInfo.fileName());
+  auto candidateSaveLocation = candidateFileInfo.filePath();
+
   QString destinationFilePath = QFileDialog::getSaveFileName(
-      this, tr("Save Image"), currentFileInfo.fileName(),
+      this, tr("Save Image"), candidateSaveLocation,
       tr("Images (*.png *.jpg *.bmp);;All Files (*)"));
   if (!destinationFilePath.isEmpty()) {
 
@@ -237,6 +252,8 @@ void MainWindow::copyToLocation() {
     // Close both files
     sourceFile.close();
     destinationFile.close();
+
+    setLastDestination(destinationFilePath);
   }
 }
 

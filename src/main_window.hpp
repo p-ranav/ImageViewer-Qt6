@@ -21,6 +21,7 @@
 #include <iostream>
 #include <atomic>
 #include "IconHelper.hpp"
+#include <QSettings>
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
