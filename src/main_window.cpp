@@ -68,16 +68,6 @@ MainWindow::MainWindow() : QMainWindow() {
   zoomOutAction->setShortcut(QKeySequence("Ctrl+-"));
   connect(zoomOutAction, &QAction::triggered, this, &MainWindow::zoomOut);
 
-  QAction *previousImageAction = new QAction("Previous Image", this);
-  previousImageAction->setShortcut(QKeySequence("Ctrl+P"));
-  connect(previousImageAction, &QAction::triggered, this,
-          [this]() { emit previousImage(imageViewer->pixmap()); });
-
-  QAction *nextImageAction = new QAction("Next Image", this);
-  nextImageAction->setShortcut(QKeySequence("Ctrl+N"));
-  connect(nextImageAction, &QAction::triggered, this,
-          [this]() { emit nextImage(imageViewer->pixmap()); });
-
   // Create an "Zen mode" action
   QAction *zenModeAction = new QAction("Toggle Zen Mode", this);
   zenModeAction->setShortcut(QKeySequence("Ctrl+Z"));
@@ -92,9 +82,6 @@ MainWindow::MainWindow() : QMainWindow() {
   fileMenu->addAction(quickExportAction);
   viewMenu->addAction(zoomInAction);
   viewMenu->addAction(zoomOutAction);
-  viewMenu->addSeparator();
-  viewMenu->addAction(previousImageAction);
-  viewMenu->addAction(nextImageAction);
   viewMenu->addSeparator();
   viewMenu->addAction(zenModeAction);
 
@@ -135,10 +122,11 @@ MainWindow::MainWindow() : QMainWindow() {
 
   // Set the icon with a specific color
   QColor iconColor(Qt::white); // Set your desired color
-  m_leftArrowButton->setIcon(
-      createColorIcon(":/images/left_arrow.png", iconColor, 24));
-  m_rightArrowButton->setIcon(
-      createColorIcon(":/images/right_arrow.png", iconColor, 24));
+  m_leftArrowIcon = createColorIcon(":/images/left_arrow.png", iconColor, 24);
+  m_leftArrowButton->setIcon(m_leftArrowIcon);
+
+  m_rightArrowIcon = createColorIcon(":/images/right_arrow.png", iconColor, 24);
+  m_rightArrowButton->setIcon(m_rightArrowIcon);
 
   m_centralWidget->setStyleSheet(
       "background-color: rgb(25, 25, 25); padding: 0px;");
@@ -206,6 +194,25 @@ void MainWindow::onImageLoaded(const QFileInfo &, const QPixmap &imagePixmap,
   // Set the resized image to the QLabel
   imageViewer->setPixmap(imagePixmap, width() * getScaleFactor(),
                          height() * getScaleFactor());
+
+  if (!imageLoader->hasPrevious()) {
+    m_leftArrowIcon =
+        createColorIcon(":/images/left_arrow.png", QColor(35, 35, 35), 24);
+    m_leftArrowButton->setIcon(m_leftArrowIcon);
+  } else {
+    m_leftArrowIcon = createColorIcon(":/images/left_arrow.png", Qt::white, 24);
+    m_leftArrowButton->setIcon(m_leftArrowIcon);
+  }
+
+  if (!imageLoader->hasNext()) {
+    m_rightArrowIcon =
+        createColorIcon(":/images/right_arrow.png", QColor(35, 35, 35), 24);
+    m_rightArrowButton->setIcon(m_rightArrowIcon);
+  } else {
+    m_rightArrowIcon =
+        createColorIcon(":/images/right_arrow.png", Qt::white, 24);
+    m_rightArrowButton->setIcon(m_rightArrowIcon);
+  }
 }
 
 void MainWindow::onNoMoreImagesLeft() {
@@ -291,4 +298,22 @@ qreal MainWindow::getScaleFactor() const {
   } else {
     return SCALE_FACTOR;
   }
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event) {
+  switch (event->key()) {
+  case Qt::Key_Up:
+    /// std::cout << "UP\n";
+    break;
+  case Qt::Key_Down:
+    /// std::cout << "DOWN\n";
+    break;
+  case Qt::Key_Right:
+    emit nextImage(imageViewer->pixmap());
+    break;
+  case Qt::Key_Left:
+    emit previousImage(imageViewer->pixmap());
+    break;
+  }
+  /// QMainWindow::keyPressEvent(event);
 }

@@ -43,6 +43,7 @@ protected:
   void closeEvent(QCloseEvent *event) override;
   void resizeEvent(QResizeEvent* event) override;
   void mouseDoubleClickEvent(QMouseEvent *event) override;
+  void keyPressEvent(QKeyEvent *event) override;
 
 signals:
   void loadImage(const QString &imagePath);
@@ -69,7 +70,11 @@ private:
   ImageViewer *imageViewer;
 
   QWidget* m_toolbarWidget;
+
+  QIcon m_leftArrowIcon;
   QPushButton *m_leftArrowButton;
+
+  QIcon m_rightArrowIcon;
   QPushButton *m_rightArrowButton;
 
   QWidget * m_centralWidget;

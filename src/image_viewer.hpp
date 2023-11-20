@@ -38,4 +38,5 @@ protected:
   bool event(QEvent *event) override;
   void wheelEvent(QWheelEvent *event) override;
   bool nativeGestureEvent(QNativeGestureEvent *event);
+  void keyPressEvent(QKeyEvent *event) override;
 };

@@ -103,3 +103,9 @@ bool ImageViewer::nativeGestureEvent(QNativeGestureEvent *event) {
 
   return false;
 }
+
+void ImageViewer::keyPressEvent(QKeyEvent *event) {
+  if (parentWidget()) {
+    QApplication::sendEvent(parentWidget(), event);
+  }
+}
