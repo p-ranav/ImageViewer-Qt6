@@ -69,7 +69,7 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(zoomOutAction, &QAction::triggered, this, &MainWindow::zoomOut);
 
   // Create an "Slideshow" action
-  QAction *slideshowAction = new QAction("Slideshow", this);
+  QAction *slideshowAction = new QAction("Start Slideshow", this);
   connect(slideshowAction, &QAction::triggered, this,
           &MainWindow::startSlideshow);
 
