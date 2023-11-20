@@ -201,12 +201,15 @@ void MainWindow::copyToClipboard() {
 }
 
 void MainWindow::onImageLoaded(const QFileInfo &fileInfo,
-                               const QPixmap &imagePixmap, const ImageInfo &) {
+                               const QPixmap &imagePixmap,
+                               const ImageInfo &imageInfo) {
   // Set the resized image to the QLabel
   imageViewer->setPixmap(imagePixmap, width() * getScaleFactor(),
                          height() * getScaleFactor());
 
-  setWindowTitle(fileInfo.fileName());
+  setWindowTitle(
+      fileInfo.fileName() +
+      QString(" (%1 x %2)").arg(imageInfo.width).arg(imageInfo.height));
 
   if (!imageLoader->hasPrevious()) {
     m_leftArrowIcon =
