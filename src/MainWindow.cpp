@@ -33,6 +33,7 @@ MainWindow::MainWindow() : QMainWindow() {
   CONNECT_TO_IMAGE_LOADER(changeSortOrder);
   CONNECT_TO_IMAGE_LOADER(changeSortBy);
   CONNECT_TO_IMAGE_LOADER(copyCurrentImageFullResToClipboard);
+  CONNECT_TO_IMAGE_LOADER(slideShowNext);
 
   connect(imageLoader, &ImageLoader::noMoreImagesLeft, this,
           &MainWindow::onNoMoreImagesLeft, Qt::QueuedConnection);
@@ -379,17 +380,7 @@ void MainWindow::zoomIn() { imageViewer->zoomIn(); }
 void MainWindow::zoomOut() { imageViewer->zoomOut(); }
 
 void MainWindow::slideshowTimerCallback() {
-  if (imageLoader->hasNext()) {
-    emit nextImage(imageViewer->pixmap());
-  } else {
-    /// No more images left
-
-    /// Check if slideshow is configured to loop
-    if (m_slideshowLoop) {
-      /// Restart slideshow
-      emit goToStart();
-    }
-  }
+  emit slideShowNext(imageViewer->pixmap(), m_slideshowLoop);
 }
 
 void MainWindow::startSlideshow() { slideshowTimer->start(); }

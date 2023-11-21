@@ -67,6 +67,7 @@ signals:
   void changeSortOrder(SortOrder order);
   void changeSortBy(SortBy type);
   void copyCurrentImageFullResToClipboard();
+  void slideShowNext(const QPixmap& currentPixmap, bool loop);
 
 private:
   void createSortOrderMenu(QMenu * viewMenu);

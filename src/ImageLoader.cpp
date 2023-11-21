@@ -261,6 +261,20 @@ void ImageLoader::copyCurrentImageFullResToClipboard() {
   clipboard->setPixmap(imagePixmap);
 }
 
+void ImageLoader::slideShowNext(const QPixmap &currentPixmap, bool loop) {
+  if (hasNext()) {
+    nextImage(currentPixmap);
+  } else {
+    /// No more images left
+
+    /// Check if slideshow is configured to loop
+    if (loop) {
+      /// Restart slideshow
+      goToStart();
+    }
+  }
+}
+
 void ImageLoader::deleteCurrentImage() {
 
   auto imagePath = m_imageFilePaths[m_currentIndex];

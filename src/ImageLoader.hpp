@@ -73,6 +73,7 @@ public slots:
   void changeSortOrder(SortOrder order);
   void changeSortBy(SortBy type);
   void copyCurrentImageFullResToClipboard();
+  void slideShowNext(const QPixmap& currentPixmap, bool loop);
 
 signals:
   void imageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap, const ImageInfo& imageInfo);
