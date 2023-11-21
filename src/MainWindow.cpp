@@ -1,7 +1,8 @@
 #include "MainWindow.hpp"
 
-#define CONNECT_TO_IMAGE_LOADER(signal_slot_name) \
-  connect(this, &MainWindow::signal_slot_name, imageLoader, &ImageLoader::signal_slot_name, Qt::QueuedConnection);
+#define CONNECT_TO_IMAGE_LOADER(signal_slot_name)                              \
+  connect(this, &MainWindow::signal_slot_name, imageLoader,                    \
+          &ImageLoader::signal_slot_name, Qt::QueuedConnection);
 
 MainWindow::MainWindow() : QMainWindow() {
 
@@ -28,8 +29,8 @@ MainWindow::MainWindow() : QMainWindow() {
   CONNECT_TO_IMAGE_LOADER(nextImage);
   CONNECT_TO_IMAGE_LOADER(goForward);
   CONNECT_TO_IMAGE_LOADER(deleteCurrentImage);
-  CONNECT_TO_IMAGE_LOADER(sortAscending);
-  CONNECT_TO_IMAGE_LOADER(sortDescending);
+  CONNECT_TO_IMAGE_LOADER(changeSortOrder);
+  CONNECT_TO_IMAGE_LOADER(changeSortBy);
 
   connect(imageLoader, &ImageLoader::noMoreImagesLeft, this,
           &MainWindow::onNoMoreImagesLeft, Qt::QueuedConnection);
@@ -152,7 +153,7 @@ MainWindow::MainWindow() : QMainWindow() {
   openImage();
 }
 
-void MainWindow::createSortOrderMenu(QMenu * viewMenu) {
+void MainWindow::createSortOrderMenu(QMenu *viewMenu) {
   // Create the "Sort Order" menu
   QMenu *sortOrderMenu = viewMenu->addMenu(tr("Sort Order"));
 
@@ -171,9 +172,9 @@ void MainWindow::createSortOrderMenu(QMenu * viewMenu) {
 
   // Connect actions to slots
   connect(ascendingAction, &QAction::triggered, this,
-          [this]() { onChangeSortOrder(true); });
+          [this]() { emit changeSortOrder(SortOrder::ascending); });
   connect(descendingAction, &QAction::triggered, this,
-          [this]() { onChangeSortOrder(false); });
+          [this]() { emit changeSortOrder(SortOrder::descending); });
 
   // By default, set "Ascending" as checked
   ascendingAction->setChecked(true);
@@ -183,7 +184,7 @@ void MainWindow::createSortOrderMenu(QMenu * viewMenu) {
   sortOrderMenu->addAction(descendingAction);
 }
 
-void MainWindow::createSortByMenu(QMenu * viewMenu) {
+void MainWindow::createSortByMenu(QMenu *viewMenu) {
   // Create the "Sort By" menu
   QMenu *sortByMenu = viewMenu->addMenu(tr("Sort By"));
 
@@ -205,11 +206,11 @@ void MainWindow::createSortByMenu(QMenu * viewMenu) {
 
   // Connect actions to slots
   connect(nameAction, &QAction::triggered, this,
-          [this]() { onChangeSortBy(SortBy::name); });
+          [this]() { emit changeSortBy(SortBy::name); });
   connect(sizeAction, &QAction::triggered, this,
-          [this]() { onChangeSortBy(SortBy::size); });
+          [this]() { emit changeSortBy(SortBy::size); });
   connect(dateModifiedAction, &QAction::triggered, this,
-          [this]() { onChangeSortBy(SortBy::date_modified); });
+          [this]() { emit changeSortBy(SortBy::date_modified); });
 
   // By default, set "Ascending" as checked
   nameAction->setChecked(true);
@@ -458,20 +459,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 }
 
 void MainWindow::showPreferences() { m_preferences->show(); }
-
-void MainWindow::onChangeSortOrder(bool ascending) {
-  if (ascending) {
-    qDebug() << "Ascending sort\n";
-    emit sortAscending();
-  } else {
-    qDebug() << "Descending sort\n";
-    emit sortDescending();
-  }
-}
-
-void MainWindow::onChangeSortBy(SortBy type) {
-
-}
 
 void MainWindow::settingChangedSlideShowPeriod() {
   slideshowTimer->setInterval(

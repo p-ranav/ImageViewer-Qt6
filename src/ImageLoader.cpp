@@ -300,23 +300,24 @@ void ImageLoader::deleteCurrentImage() {
   }
 }
 
-void ImageLoader::sortAscending() {
-  if (m_currentSortOrderAscending) {
-    // Do nothing
-  } else {
-    m_currentSortOrderAscending = true;
+// Comparison function for sorting QString objects by name
+bool ImageLoader::compareFilePathsByName(const QString &a, const QString &b) {
+  return a.compare(b, Qt::CaseInsensitive) < 0;
+}
 
-    const auto currentImagePath = m_imageFilePaths[m_currentIndex];
+// Comparison function for sorting QString objects by size
+bool ImageLoader::compareFilePathsBySize(const QString &a, const QString &b) {
+  QFileInfo fileInfoA(a);
+  QFileInfo fileInfoB(b);
+  return fileInfoA.size() < fileInfoB.size();
+}
 
-    // Sort descending order
-    std::sort(m_imageFilePaths.begin(), m_imageFilePaths.end());
-
-    // update m_currentIndex
-    updateCurrentIndexAfterSort(currentImagePath);
-
-    // loadImage and prefetch new next/prev images
-    loadImage(m_imageFilePaths[m_currentIndex]);
-  }
+// Comparison function for sorting QString objects by date modified
+bool ImageLoader::compareFilePathsByDateModified(const QString &a,
+                                                 const QString &b) {
+  QFileInfo fileInfoA(a);
+  QFileInfo fileInfoB(b);
+  return fileInfoA.lastModified() < fileInfoB.lastModified();
 }
 
 void ImageLoader::updateCurrentIndexAfterSort(const QString &currentImagePath) {
@@ -333,25 +334,66 @@ void ImageLoader::updateCurrentIndexAfterSort(const QString &currentImagePath) {
   }
 }
 
-void ImageLoader::sortDescending() {
-  if (m_currentSortOrderAscending) {
-    m_currentSortOrderAscending = false;
+void ImageLoader::sortAscending(const ImageLoader::SortFunction &compare_fn) {
+  const auto currentImagePath = m_imageFilePaths[m_currentIndex];
 
-    const auto currentImagePath = m_imageFilePaths[m_currentIndex];
+  // Sort descending order
+  std::sort(m_imageFilePaths.begin(), m_imageFilePaths.end(), compare_fn);
 
-    // Sort descending order
-    std::sort(m_imageFilePaths.rbegin(), m_imageFilePaths.rend());
+  // update m_currentIndex
+  m_currentIndex = 0;
+  /// updateCurrentIndexAfterSort(currentImagePath);
 
-    // update m_currentIndex
-    updateCurrentIndexAfterSort(currentImagePath);
+  // loadImage and prefetch new next/prev images
+  loadImage(m_imageFilePaths[m_currentIndex]);
+}
 
-    // loadImage and prefetch new next/prev images
-    loadImage(m_imageFilePaths[m_currentIndex]);
+void ImageLoader::sortDescending(const ImageLoader::SortFunction &compare_fn) {
+  const auto currentImagePath = m_imageFilePaths[m_currentIndex];
+
+  // Sort descending order
+  std::sort(m_imageFilePaths.rbegin(), m_imageFilePaths.rend(), compare_fn);
+
+  // update m_currentIndex
+  m_currentIndex = 0;
+  /// updateCurrentIndexAfterSort(currentImagePath);
+
+  // loadImage and prefetch new next/prev images
+  loadImage(m_imageFilePaths[m_currentIndex]);
+}
+
+void ImageLoader::sort() {
+  /// Sort image file paths based on
+  /// m_currentSortOrderAscending and m_currentSortByType
+
+  ImageLoader::SortFunction fn;
+  if (m_currentSortByType == SortBy::name) {
+    fn = compareFilePathsByName;
+  } else if (m_currentSortByType == SortBy::size) {
+    fn = compareFilePathsBySize;
+  } else if (m_currentSortByType == SortBy::date_modified) {
+    fn = compareFilePathsByDateModified;
+  }
+
+  if (fn) {
+    if (m_currentSortOrder == SortOrder::ascending) {
+      sortAscending(fn);
+    } else {
+      sortDescending(fn);
+    }
   }
 }
 
-QString ImageLoader::getHeaderLabel() const {
-  return QString("%1 / %2")
-      .arg(m_currentIndex + 1)
-      .arg(m_imageFilePaths.size());
+void ImageLoader::changeSortOrder(SortOrder order) {
+  if (order != m_currentSortOrder) {
+    m_currentSortOrder = order;
+    sort();
+  }
+}
+
+void ImageLoader::changeSortBy(SortBy type) {
+  if (type != m_currentSortByType) {
+    m_currentSortByType = type;
+    sort();
+  }
 }
