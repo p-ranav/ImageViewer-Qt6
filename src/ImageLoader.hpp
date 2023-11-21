@@ -11,6 +11,8 @@
 #include <QDir>
 #include <QFile>
 #include <QColorSpace>
+#include <QGuiApplication>
+#include <QClipboard>
 
 #include <libexif/exif-data.h>
 
@@ -56,7 +58,6 @@ class ImageLoader : public QObject {
 public:
   ImageLoader();
   QString getCurrentImageFilePath();
-  QPixmap getCurrentImageFullRes();
   bool hasNext() const;
   bool hasPrevious() const;
 
@@ -71,6 +72,7 @@ public slots:
   void deleteCurrentImage();
   void changeSortOrder(SortOrder order);
   void changeSortBy(SortBy type);
+  void copyCurrentImageFullResToClipboard();
 
 signals:
   void imageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap, const ImageInfo& imageInfo);

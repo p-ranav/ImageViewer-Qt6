@@ -251,13 +251,14 @@ QString ImageLoader::getCurrentImageFilePath() {
   return m_imageFilePaths[m_currentIndex];
 }
 
-QPixmap ImageLoader::getCurrentImageFullRes() {
+void ImageLoader::copyCurrentImageFullResToClipboard() {
   auto imagePath = m_imageFilePaths[m_currentIndex];
 
   QPixmap imagePixmap;
   m_currentImageInfo = loadImageIntoPixmap(imagePath, imagePixmap, false);
 
-  return imagePixmap;
+  QClipboard *clipboard = QGuiApplication::clipboard();
+  clipboard->setPixmap(imagePixmap);
 }
 
 void ImageLoader::deleteCurrentImage() {

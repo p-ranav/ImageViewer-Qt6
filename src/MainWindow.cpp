@@ -32,6 +32,7 @@ MainWindow::MainWindow() : QMainWindow() {
   CONNECT_TO_IMAGE_LOADER(deleteCurrentImage);
   CONNECT_TO_IMAGE_LOADER(changeSortOrder);
   CONNECT_TO_IMAGE_LOADER(changeSortBy);
+  CONNECT_TO_IMAGE_LOADER(copyCurrentImageFullResToClipboard);
 
   connect(imageLoader, &ImageLoader::noMoreImagesLeft, this,
           &MainWindow::onNoMoreImagesLeft, Qt::QueuedConnection);
@@ -76,11 +77,6 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(deleteAction, &QAction::triggered, this,
           &MainWindow::confirmAndDeleteCurrentImage);
 
-  // Create a "Quick Export as a PNG" action
-  QAction *quickExportAction = new QAction("Quick Export as a PNG", this);
-  connect(quickExportAction, &QAction::triggered, this,
-          &MainWindow::quickExportAsPng);
-
   QAction *preferencesAction = new QAction("Preferences", this);
   connect(preferencesAction, &QAction::triggered, this,
           &MainWindow::showPreferences);
@@ -121,8 +117,6 @@ MainWindow::MainWindow() : QMainWindow() {
   fileMenu->addAction(copyToLocationAction);
   fileMenu->addSeparator();
   fileMenu->addAction(deleteAction);
-  fileMenu->addSeparator();
-  fileMenu->addAction(quickExportAction);
   fileMenu->addSeparator();
   fileMenu->addAction(preferencesAction);
   fileMenu->addAction(quitAction);
@@ -248,39 +242,8 @@ void MainWindow::openImage() {
   }
 }
 
-void MainWindow::quickExportAsPng() {
-
-  QString currentFilePath = imageLoader->getCurrentImageFilePath();
-  QFileInfo fileInfo(currentFilePath);
-  QString fileName = fileInfo.baseName();
-
-  // Get a file name for saving the PNG
-  QString saveFileName = QFileDialog::getSaveFileName(
-      nullptr, "Save PNG File", fileName + ".png", "PNG Files (*.png)");
-
-  if (saveFileName.isEmpty()) {
-    // User canceled the operation or didn't provide a file name
-    return;
-  }
-
-  // Ensure the file extension is .png
-  if (!saveFileName.toLower().endsWith(".png")) {
-    saveFileName += ".png";
-  }
-
-  // Save the image as a PNG file
-  auto pixmapFullRes = imageLoader->getCurrentImageFullRes();
-  if (pixmapFullRes.save(saveFileName, "PNG")) {
-    qDebug() << "Image saved successfully as" << saveFileName;
-  } else {
-    qDebug() << "Error saving image";
-  }
-}
-
 void MainWindow::copyToClipboard() {
-  const auto pixmapFullRes = imageLoader->getCurrentImageFullRes();
-  QClipboard *clipboard = QGuiApplication::clipboard();
-  clipboard->setPixmap(pixmapFullRes);
+  emit copyCurrentImageFullResToClipboard();
 }
 
 void MainWindow::copyImagePathToClipboard() {

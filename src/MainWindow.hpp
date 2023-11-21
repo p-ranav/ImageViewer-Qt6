@@ -43,7 +43,6 @@ public slots:
   void copyToLocation();
   void onImageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap, const ImageInfo& imageInfo);
   void onNoMoreImagesLeft();
-  void quickExportAsPng();
   void showPreferences();
 
   // Slots for each setting change in the preferences widget
@@ -67,6 +66,7 @@ signals:
   void deleteCurrentImage();
   void changeSortOrder(SortOrder order);
   void changeSortBy(SortBy type);
+  void copyCurrentImageFullResToClipboard();
 
 private:
   void createSortOrderMenu(QMenu * viewMenu);
