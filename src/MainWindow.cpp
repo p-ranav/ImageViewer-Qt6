@@ -129,7 +129,31 @@ MainWindow::MainWindow() : QMainWindow() {
   viewMenu->addSeparator();
   viewMenu->addAction(slideshowAction);
 
-  // Create the "Sort" menu
+  createSortByMenu(viewMenu);
+  createSortOrderMenu(viewMenu);
+
+  // Create a imageViewer to display the image
+  imageViewer = new ImageViewer(this);
+  connect(imageViewer, &ImageViewer::copyRequested, this,
+          &MainWindow::copyToClipboard);
+  connect(imageViewer, &ImageViewer::deleteRequested, this,
+          &MainWindow::deleteCurrentImage);
+
+  m_centralWidget = new QWidget(this);
+  auto vstackLayout = new QVBoxLayout();
+  vstackLayout->addWidget(imageViewer);
+  m_centralWidget->setLayout(vstackLayout);
+
+  m_centralWidget->setStyleSheet(
+      "background-color: rgb(25, 25, 25); padding: 0px;");
+
+  setCentralWidget(m_centralWidget);
+
+  openImage();
+}
+
+void MainWindow::createSortOrderMenu(QMenu * viewMenu) {
+  // Create the "Sort Order" menu
   QMenu *sortOrderMenu = viewMenu->addMenu(tr("Sort Order"));
 
   // Create action group
@@ -157,25 +181,43 @@ MainWindow::MainWindow() : QMainWindow() {
   // Add actions to the "Sort" menu
   sortOrderMenu->addAction(ascendingAction);
   sortOrderMenu->addAction(descendingAction);
+}
 
-  // Create a imageViewer to display the image
-  imageViewer = new ImageViewer(this);
-  connect(imageViewer, &ImageViewer::copyRequested, this,
-          &MainWindow::copyToClipboard);
-  connect(imageViewer, &ImageViewer::deleteRequested, this,
-          &MainWindow::deleteCurrentImage);
+void MainWindow::createSortByMenu(QMenu * viewMenu) {
+  // Create the "Sort By" menu
+  QMenu *sortByMenu = viewMenu->addMenu(tr("Sort By"));
 
-  m_centralWidget = new QWidget(this);
-  auto vstackLayout = new QVBoxLayout();
-  vstackLayout->addWidget(imageViewer);
-  m_centralWidget->setLayout(vstackLayout);
+  // Create action group
+  QActionGroup *sortGroup = new QActionGroup(this);
 
-  m_centralWidget->setStyleSheet(
-      "background-color: rgb(25, 25, 25); padding: 0px;");
+  // Create actions for "Ascending" and "Descending"
+  QAction *nameAction = new QAction(tr("Name"), this);
+  QAction *sizeAction = new QAction(tr("Size"), this);
+  QAction *dateModifiedAction = new QAction(tr("Date Modified"), this);
 
-  setCentralWidget(m_centralWidget);
+  // Set checkable property and add actions to the group
+  nameAction->setCheckable(true);
+  sizeAction->setCheckable(true);
+  dateModifiedAction->setCheckable(true);
+  sortGroup->addAction(nameAction);
+  sortGroup->addAction(sizeAction);
+  sortGroup->addAction(dateModifiedAction);
 
-  openImage();
+  // Connect actions to slots
+  connect(nameAction, &QAction::triggered, this,
+          [this]() { onChangeSortBy(SortBy::name); });
+  connect(sizeAction, &QAction::triggered, this,
+          [this]() { onChangeSortBy(SortBy::size); });
+  connect(dateModifiedAction, &QAction::triggered, this,
+          [this]() { onChangeSortBy(SortBy::date_modified); });
+
+  // By default, set "Ascending" as checked
+  nameAction->setChecked(true);
+
+  // Add actions to the "Sort" menu
+  sortByMenu->addAction(nameAction);
+  sortByMenu->addAction(sizeAction);
+  sortByMenu->addAction(dateModifiedAction);
 }
 
 void MainWindow::openImage() {
@@ -425,6 +467,10 @@ void MainWindow::onChangeSortOrder(bool ascending) {
     qDebug() << "Descending sort\n";
     emit sortDescending();
   }
+}
+
+void MainWindow::onChangeSortBy(SortBy type) {
+
 }
 
 void MainWindow::settingChangedSlideShowPeriod() {

@@ -21,6 +21,7 @@
 #include "ImageViewer.hpp"
 #include "IconHelper.hpp"
 #include "Preferences.hpp"
+#include "SortBy.hpp"
 
 #include <chrono>
 #include <iostream>
@@ -45,6 +46,7 @@ public slots:
   void quickExportAsPng();
   void showPreferences();
   void onChangeSortOrder(bool ascending);
+  void onChangeSortBy(SortBy type);
 
   // Slots for each setting change in the preferences widget
   void settingChangedSlideShowPeriod();
@@ -68,6 +70,8 @@ signals:
   void sortDescending();
 
 private:
+  void createSortOrderMenu(QMenu * viewMenu);
+  void createSortByMenu(QMenu * viewMenu);
   void zoomIn();
   void zoomOut();
   void slideshowTimerCallback();
