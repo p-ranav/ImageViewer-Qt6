@@ -18,23 +18,28 @@ MainWindow::MainWindow() : QMainWindow() {
   imageLoader->moveToThread(imageLoaderThread);
 
   // Connect signals and slots for image loading
-  connect(this, &MainWindow::loadImage, imageLoader, &ImageLoader::loadImage);
-  connect(this, &MainWindow::goToStart, imageLoader, &ImageLoader::goToStart);
-  connect(this, &MainWindow::goBackward, imageLoader, &ImageLoader::goBackward);
+  connect(this, &MainWindow::loadImage, imageLoader, &ImageLoader::loadImage,
+          Qt::QueuedConnection);
+  connect(this, &MainWindow::goToStart, imageLoader, &ImageLoader::goToStart,
+          Qt::QueuedConnection);
+  connect(this, &MainWindow::goBackward, imageLoader, &ImageLoader::goBackward,
+          Qt::QueuedConnection);
   connect(this, &MainWindow::previousImage, imageLoader,
-          &ImageLoader::previousImage);
-  connect(this, &MainWindow::nextImage, imageLoader, &ImageLoader::nextImage);
-  connect(this, &MainWindow::goForward, imageLoader, &ImageLoader::goForward);
+          &ImageLoader::previousImage, Qt::QueuedConnection);
+  connect(this, &MainWindow::nextImage, imageLoader, &ImageLoader::nextImage,
+          Qt::QueuedConnection);
+  connect(this, &MainWindow::goForward, imageLoader, &ImageLoader::goForward,
+          Qt::QueuedConnection);
   connect(this, &MainWindow::deleteCurrentImage, imageLoader,
-          &ImageLoader::deleteCurrentImage);
+          &ImageLoader::deleteCurrentImage, Qt::QueuedConnection);
   connect(this, &MainWindow::sortAscending, imageLoader,
-          &ImageLoader::sortAscending);
+          &ImageLoader::sortAscending, Qt::QueuedConnection);
   connect(this, &MainWindow::sortDescending, imageLoader,
-          &ImageLoader::sortDescending);
+          &ImageLoader::sortDescending, Qt::QueuedConnection);
   connect(imageLoader, &ImageLoader::noMoreImagesLeft, this,
-          &MainWindow::onNoMoreImagesLeft);
+          &MainWindow::onNoMoreImagesLeft, Qt::QueuedConnection);
   connect(imageLoader, &ImageLoader::imageLoaded, this,
-          &MainWindow::onImageLoaded);
+          &MainWindow::onImageLoaded, Qt::QueuedConnection);
 
   // Start the thread
   imageLoaderThread->start();
