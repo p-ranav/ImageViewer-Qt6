@@ -102,8 +102,11 @@ MainWindow::MainWindow() : QMainWindow() {
           &MainWindow::startSlideshow);
 
   slideshowTimer = new QTimer(this);
-  slideshowTimer->setInterval(
-      m_preferences->get(Preferences::SETTING_SLIDESHOW_PERIOD, 2500).toInt());
+
+  auto interval =
+      m_preferences->get(Preferences::SETTING_SLIDESHOW_PERIOD, 2500).toInt();
+  m_preferences->set(Preferences::SETTING_SLIDESHOW_PERIOD, interval);
+  slideshowTimer->setInterval(interval);
   connect(slideshowTimer, &QTimer::timeout, this,
           &MainWindow::slideshowTimerCallback);
 

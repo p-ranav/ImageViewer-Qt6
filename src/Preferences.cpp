@@ -63,9 +63,17 @@ QWidget *Preferences::setupSlideshowTab() {
 }
 
 void Preferences::handleEditingFinished_slideshowPeriod() {
+  m_slideshowPeriod->clearFocus();
+
   QString text = m_slideshowPeriod->text();
   bool ok;
   float newSlideshowPeriod = text.toFloat(&ok);
+
+  if (newSlideshowPeriod < 1) {
+    newSlideshowPeriod = 1; // at least 1s
+  }
+
+  m_slideshowPeriod->setText(QString("%1").arg(newSlideshowPeriod));
 
   if (ok) {
     // If the conversion to float was successful
