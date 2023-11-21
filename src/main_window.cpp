@@ -54,6 +54,11 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(copyToClipboardAction, &QAction::triggered, this,
           &MainWindow::copyToClipboard);
 
+  // Create a "Copy Image Path" action
+  QAction *copyImagePathAction = new QAction("Copy Image Path", this);
+  connect(copyImagePathAction, &QAction::triggered, this,
+          &MainWindow::copyImagePathToClipboard);
+
   // Create a "Copy to..." action
   QAction *copyToLocationAction = new QAction("Copy to...", this);
   connect(copyToLocationAction, &QAction::triggered, this,
@@ -108,6 +113,7 @@ MainWindow::MainWindow() : QMainWindow() {
   // Add the "Open" action to the "File" menu
   fileMenu->addAction(openAction);
   fileMenu->addAction(copyToClipboardAction);
+  fileMenu->addAction(copyImagePathAction);
   fileMenu->addAction(copyToLocationAction);
   fileMenu->addAction(deleteAction);
   fileMenu->addSeparator();
@@ -221,6 +227,11 @@ void MainWindow::copyToClipboard() {
   const auto pixmapFullRes = imageLoader->getCurrentImageFullRes();
   QClipboard *clipboard = QGuiApplication::clipboard();
   clipboard->setPixmap(pixmapFullRes);
+}
+
+void MainWindow::copyImagePathToClipboard() {
+  QClipboard *clipboard = QGuiApplication::clipboard();
+  clipboard->setText(imageLoader->getCurrentImageFilePath());
 }
 
 QString getLastDestination() {
