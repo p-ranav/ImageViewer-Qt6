@@ -249,7 +249,7 @@ void MainWindow::copyToClipboard() {
 
 void MainWindow::copyImagePathToClipboard() {
   QClipboard *clipboard = QGuiApplication::clipboard();
-  clipboard->setText(imageLoader->getCurrentImageFilePath());
+  clipboard->setText(m_currentFileInfo.absoluteFilePath());
 }
 
 QString getLastDestination() {
@@ -263,10 +263,7 @@ void setLastDestination(const QString &path) {
 }
 
 void MainWindow::copyToLocation() {
-  auto currentFilePath = imageLoader->getCurrentImageFilePath();
-
-  QFileInfo currentFileInfo(currentFilePath);
-  QFile sourceFile(currentFilePath);
+  QFile sourceFile(m_currentFileInfo.absoluteFilePath());
   if (!sourceFile.open(QIODevice::ReadOnly)) {
     qWarning() << "Failed to open source file:" << sourceFile.errorString();
     return;
@@ -274,7 +271,7 @@ void MainWindow::copyToLocation() {
 
   QString lastUsedDestination = getLastDestination();
   QDir candidateDir(lastUsedDestination);
-  QFileInfo candidateFileInfo(candidateDir, currentFileInfo.fileName());
+  QFileInfo candidateFileInfo(candidateDir, m_currentFileInfo.fileName());
   auto candidateSaveLocation = candidateFileInfo.filePath();
 
   QString destinationFilePath = QFileDialog::getSaveFileName(
@@ -307,6 +304,8 @@ void MainWindow::copyToLocation() {
 void MainWindow::onImageLoaded(const QFileInfo &fileInfo,
                                const QPixmap &imagePixmap,
                                const ImageInfo &imageInfo) {
+
+  m_currentFileInfo = fileInfo;
 
   // Set the resized image to the QLabel
   imageViewer->setPixmap(imagePixmap, width() * getScaleFactor(),

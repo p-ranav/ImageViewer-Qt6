@@ -247,10 +247,6 @@ void ImageLoader::goForward() {
   loadImage(m_imageFilePaths[m_currentIndex]);
 }
 
-QString ImageLoader::getCurrentImageFilePath() {
-  return m_imageFilePaths[m_currentIndex];
-}
-
 void ImageLoader::copyCurrentImageFullResToClipboard() {
   auto imagePath = m_imageFilePaths[m_currentIndex];
 

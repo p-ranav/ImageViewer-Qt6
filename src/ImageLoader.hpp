@@ -57,7 +57,6 @@ class ImageLoader : public QObject {
 
 public:
   ImageLoader();
-  QString getCurrentImageFilePath();
   bool hasNext() const;
   bool hasPrevious() const;
 

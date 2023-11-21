@@ -87,6 +87,7 @@ private:
 
   bool m_sidebarVisible{false};
   ImageViewer *imageViewer;
+  QFileInfo m_currentFileInfo;
 
   QWidget* m_toolbarWidget;
 
