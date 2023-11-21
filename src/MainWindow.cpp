@@ -347,9 +347,11 @@ void MainWindow::onImageLoaded(const QFileInfo &fileInfo,
   imageViewer->setPixmap(imagePixmap, width() * getScaleFactor(),
                          height() * getScaleFactor());
 
-  setWindowTitle(
-      fileInfo.fileName() +
-      QString(" (%1 x %2) [%3]").arg(imageInfo.width).arg(imageInfo.height).arg(prettyPrintSize(fileInfo.size())));
+  setWindowTitle(fileInfo.fileName() +
+                 QString(" (%1 x %2) [%3]")
+                     .arg(imageInfo.width)
+                     .arg(imageInfo.height)
+                     .arg(prettyPrintSize(fileInfo.size())));
 }
 
 void MainWindow::onNoMoreImagesLeft() {

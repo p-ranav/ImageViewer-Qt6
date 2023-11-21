@@ -48,6 +48,10 @@ void ImageLoader::loadImagePathsIfEmpty(const char *directory,
     } else {
       m_currentIndex = index;
     }
+
+    /// Use the current sort settings and sort
+    /// this vector of paths
+    sort();
   }
 }
 
@@ -173,6 +177,9 @@ void ImageLoader::previousImage(const QPixmap &currentPixmap) {
 
     QFileInfo fileInfo(m_imageFilePaths[m_currentIndex - 1]);
 
+    qDebug() << "hasPrevious=True, Loading "
+             << m_imageFilePaths[m_currentIndex - 1];
+
     m_nextPixmap = currentPixmap;
     m_nextImageInfo = m_currentImageInfo;
     m_currentImageInfo = m_previousImageInfo;
@@ -183,6 +190,8 @@ void ImageLoader::previousImage(const QPixmap &currentPixmap) {
 
     m_previousImageInfo = loadImageIntoPixmap(
         m_imageFilePaths[m_currentIndex - 1], m_previousPixmap, true);
+  } else {
+    qDebug() << "hasPrevious=False";
   }
 }
 
