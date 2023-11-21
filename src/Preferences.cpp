@@ -22,11 +22,25 @@ void Preferences::setupUi() {
   tabWidget->addTab(tab1, "Tab 1");
 
   // Second tab ("Slideshow")
+  QWidget *tab2 = setupSlideshowTab();
+  tabWidget->addTab(tab2, "Slideshow");
+
+  // Third tab
+  QWidget *tab3 = new QWidget;
+  tabWidget->addTab(tab3, "Tab 3");
+
+  // Set up the layout
+  QVBoxLayout *layout = new QVBoxLayout(this);
+  layout->addWidget(tabWidget);
+}
+
+QWidget *Preferences::setupSlideshowTab() {
+  // Second tab ("Slideshow")
   QWidget *tab2 = new QWidget;
   QFormLayout *formLayout = new QFormLayout(tab2);
 
   // Slideshow Period
-  QLabel *slideshowLabel = new QLabel("Slideshow Period (s)");
+  QLabel *slideshowLabel = new QLabel("Period (s)");
   m_slideshowPeriod = new QLineEdit;
   connect(m_slideshowPeriod, &QLineEdit::editingFinished, this,
           &Preferences::handleEditingFinished_slideshowPeriod);
@@ -45,15 +59,7 @@ void Preferences::setupUi() {
           &Preferences::handleEditingFinished_slideshowLoop);
   formLayout->addRow(m_slideshowLoop);
 
-  tabWidget->addTab(tab2, "Slideshow");
-
-  // Third tab
-  QWidget *tab3 = new QWidget;
-  tabWidget->addTab(tab3, "Tab 3");
-
-  // Set up the layout
-  QVBoxLayout *layout = new QVBoxLayout(this);
-  layout->addWidget(tabWidget);
+  return tab2;
 }
 
 void Preferences::handleEditingFinished_slideshowPeriod() {

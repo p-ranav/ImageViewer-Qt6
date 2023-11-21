@@ -32,6 +32,7 @@ signals:
 
 private:
     void setupUi();
+    QWidget* setupSlideshowTab();
     void handleEditingFinished_slideshowPeriod();
     void handleEditingFinished_slideshowLoop(int state);
 };
