@@ -252,9 +252,34 @@ void MainWindow::copyToLocation() {
 void MainWindow::onImageLoaded(const QFileInfo &fileInfo,
                                const QPixmap &imagePixmap,
                                const ImageInfo &imageInfo) {
+
   // Set the resized image to the QLabel
   imageViewer->setPixmap(imagePixmap, width() * getScaleFactor(),
                          height() * getScaleFactor());
+
+  if (m_firstLoad) {
+
+    QSize sizeHint = imageViewer->sizeHint();
+
+    // Check if the size is smaller than the minimum size or larger than the
+    // default size
+    if (sizeHint.width() < m_minSize.width() ||
+        sizeHint.height() < m_minSize.height()) {
+      sizeHint = m_minSize;
+    }
+
+    // Get the primary screen's geometry
+    QScreen *primaryScreen = QGuiApplication::primaryScreen();
+    QRect screenGeometry = primaryScreen->geometry();
+
+    // Calculate the center position
+    int centerX = screenGeometry.width() / 2 - sizeHint.width() / 2;
+    int centerY = screenGeometry.height() / 2 - sizeHint.height() / 2;
+
+    setGeometry(QRect(centerX, centerY, sizeHint.width(), sizeHint.height()));
+
+    m_firstLoad = false;
+  }
 
   setWindowTitle(
       fileInfo.fileName() +
