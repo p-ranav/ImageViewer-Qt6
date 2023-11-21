@@ -24,7 +24,7 @@ class ImageLoader : public QObject {
  
   LibRaw m_rawProcessor;
 
-  std::vector<std::string> m_imageFilePaths;
+  std::vector<QString> m_imageFilePaths;
   std::size_t m_currentIndex{0};
 
   QPixmap m_previousPixmap;
@@ -34,10 +34,13 @@ class ImageLoader : public QObject {
   ImageInfo m_previousImageInfo;
   ImageInfo m_nextImageInfo;
 
+  std::atomic<bool> m_currentSortOrderAscending{true};
+
   void loadImagePathsIfEmpty(const char* directory, const char* current_file);
   ImageInfo loadRaw(const QString &imagePath, QPixmap& imagePixmap, bool half_size);
   ImageInfo loadWithImageReader(const QString &imagePath, QPixmap& imagePixmap);
   ImageInfo loadImageIntoPixmap(const QString &imagePath, QPixmap& imagePixmap, bool half_size);
+  void updateCurrentIndexAfterSort(const QString& currentImagePath);
 
 public:
   ImageLoader();
@@ -56,6 +59,8 @@ public slots:
   void nextImage(const QPixmap &currentPixmap);
   void goForward();
   void deleteCurrentImage();
+  void sortAscending();
+  void sortDescending();
 
 signals:
   void imageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap, const ImageInfo& imageInfo);

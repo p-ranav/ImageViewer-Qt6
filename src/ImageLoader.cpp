@@ -3,8 +3,8 @@
 #include <iostream>
 namespace fs = std::filesystem;
 
-std::vector<std::string> getImageFiles(const char *directory) {
-  std::vector<std::string> imageFiles;
+std::vector<QString> getImageFiles(const char *directory) {
+  std::vector<QString> imageFiles;
 
   for (const auto &entry : fs::directory_iterator(directory)) {
     if (entry.is_regular_file()) {
@@ -18,7 +18,7 @@ std::vector<std::string> getImageFiles(const char *directory) {
 
       if (std::find(allowedExtensions.begin(), allowedExtensions.end(),
                     extension) != allowedExtensions.end()) {
-        imageFiles.push_back(entry.path().string());
+        imageFiles.push_back(QString::fromStdString(entry.path().string()));
       }
     }
   }
@@ -37,7 +37,6 @@ void ImageLoader::loadImagePathsIfEmpty(const char *directory,
   if (m_imageFilePaths.empty()) {
     m_imageFilePaths = getImageFiles(directory);
 
-    // Find the index in one line using C++17
     auto it = std::find(m_imageFilePaths.begin(), m_imageFilePaths.end(),
                         current_file);
     int index = (it != m_imageFilePaths.end())
@@ -142,19 +141,17 @@ void ImageLoader::loadImage(const QString &imagePath) {
   // Prefetch next and previous images
   if (m_currentIndex >= 1) {
     m_previousImageInfo = loadImageIntoPixmap(
-        QString::fromStdString(m_imageFilePaths[m_currentIndex - 1]),
-        m_previousPixmap, true);
+        m_imageFilePaths[m_currentIndex - 1], m_previousPixmap, true);
   }
   if (m_currentIndex + 1 < m_imageFilePaths.size()) {
-    m_nextImageInfo = loadImageIntoPixmap(
-        QString::fromStdString(m_imageFilePaths[m_currentIndex + 1]),
-        m_nextPixmap, true);
+    m_nextImageInfo = loadImageIntoPixmap(m_imageFilePaths[m_currentIndex + 1],
+                                          m_nextPixmap, true);
   }
 }
 
 void ImageLoader::goToStart() {
   m_currentIndex = 0;
-  loadImage(QString::fromStdString(m_imageFilePaths[m_currentIndex]));
+  loadImage(m_imageFilePaths[m_currentIndex]);
 }
 
 bool ImageLoader::hasPrevious() const {
@@ -168,14 +165,13 @@ void ImageLoader::goBackward() {
     m_currentIndex = 0;
   }
 
-  loadImage(QString::fromStdString(m_imageFilePaths[m_currentIndex]));
+  loadImage(m_imageFilePaths[m_currentIndex]);
 }
 
 void ImageLoader::previousImage(const QPixmap &currentPixmap) {
   if (hasPrevious()) {
 
-    QFileInfo fileInfo(
-        QString::fromStdString(m_imageFilePaths[m_currentIndex - 1]));
+    QFileInfo fileInfo(m_imageFilePaths[m_currentIndex - 1]);
 
     m_nextPixmap = currentPixmap;
     m_nextImageInfo = m_currentImageInfo;
@@ -186,8 +182,7 @@ void ImageLoader::previousImage(const QPixmap &currentPixmap) {
     emit imageLoaded(fileInfo, m_previousPixmap, m_previousImageInfo);
 
     m_previousImageInfo = loadImageIntoPixmap(
-        QString::fromStdString(m_imageFilePaths[m_currentIndex - 1]),
-        m_previousPixmap, true);
+        m_imageFilePaths[m_currentIndex - 1], m_previousPixmap, true);
   }
 }
 
@@ -199,8 +194,7 @@ bool ImageLoader::hasNext() const {
 void ImageLoader::nextImage(const QPixmap &currentPixmap) {
   if (hasNext()) {
 
-    QFileInfo fileInfo(
-        QString::fromStdString(m_imageFilePaths[m_currentIndex + 1]));
+    QFileInfo fileInfo(m_imageFilePaths[m_currentIndex + 1]);
 
     m_previousPixmap = currentPixmap;
     m_previousImageInfo = m_currentImageInfo;
@@ -212,8 +206,7 @@ void ImageLoader::nextImage(const QPixmap &currentPixmap) {
 
     if (m_currentIndex + 1 < m_imageFilePaths.size()) {
       m_nextImageInfo = loadImageIntoPixmap(
-          QString::fromStdString(m_imageFilePaths[m_currentIndex + 1]),
-          m_nextPixmap, true);
+          m_imageFilePaths[m_currentIndex + 1], m_nextPixmap, true);
     }
   }
 }
@@ -227,19 +220,18 @@ void ImageLoader::goForward() {
     m_currentIndex = maxImageFiles;
   }
 
-  loadImage(QString::fromStdString(m_imageFilePaths[m_currentIndex]));
+  loadImage(m_imageFilePaths[m_currentIndex]);
 }
 
 QString ImageLoader::getCurrentImageFilePath() {
-  return QString::fromStdString(m_imageFilePaths[m_currentIndex]);
+  return m_imageFilePaths[m_currentIndex];
 }
 
 QPixmap ImageLoader::getCurrentImageFullRes() {
   auto imagePath = m_imageFilePaths[m_currentIndex];
 
   QPixmap imagePixmap;
-  m_currentImageInfo = loadImageIntoPixmap(QString::fromStdString(imagePath),
-                                           imagePixmap, false);
+  m_currentImageInfo = loadImageIntoPixmap(imagePath, imagePixmap, false);
 
   return imagePixmap;
 }
@@ -249,7 +241,7 @@ void ImageLoader::deleteCurrentImage() {
   auto imagePath = m_imageFilePaths[m_currentIndex];
 
   // Delete image
-  QFile file(QString::fromStdString(imagePath));
+  QFile file(imagePath);
   file.moveToTrash();
 
   // Delete path from tracked list of paths
@@ -270,8 +262,7 @@ void ImageLoader::deleteCurrentImage() {
     /// So just emit that and update newPixmap
     /// previousPixmap remains the same
 
-    QFileInfo fileInfo(
-        QString::fromStdString(m_imageFilePaths[m_currentIndex]));
+    QFileInfo fileInfo(m_imageFilePaths[m_currentIndex]);
 
     // Emit nextPixmap as current pixmap
     emit imageLoaded(fileInfo, m_nextPixmap, m_nextImageInfo);
@@ -281,8 +272,7 @@ void ImageLoader::deleteCurrentImage() {
     if (m_currentIndex + 1 < m_imageFilePaths.size()) {
       // Prefetch load a new image into nextPixmap
       m_nextImageInfo = loadImageIntoPixmap(
-          QString::fromStdString(m_imageFilePaths[m_currentIndex + 1]),
-          m_nextPixmap, true);
+          m_imageFilePaths[m_currentIndex + 1], m_nextPixmap, true);
     }
   } else if (m_imageFilePaths.size() > 0) {
     /// Previous condition was not true
@@ -294,8 +284,7 @@ void ImageLoader::deleteCurrentImage() {
 
     m_currentIndex -= 1;
 
-    QFileInfo fileInfo(
-        QString::fromStdString(m_imageFilePaths[m_currentIndex]));
+    QFileInfo fileInfo(m_imageFilePaths[m_currentIndex]);
 
     // Emit previousPixmap as current pixmap
     emit imageLoaded(fileInfo, m_previousPixmap, m_previousImageInfo);
@@ -304,11 +293,60 @@ void ImageLoader::deleteCurrentImage() {
 
     // Prefetch load a new image into previousPixmap
     m_previousImageInfo = loadImageIntoPixmap(
-        QString::fromStdString(m_imageFilePaths[m_currentIndex - 1]),
-        m_previousPixmap, true);
+        m_imageFilePaths[m_currentIndex - 1], m_previousPixmap, true);
 
   } else {
     emit noMoreImagesLeft();
+  }
+}
+
+void ImageLoader::sortAscending() {
+  if (m_currentSortOrderAscending) {
+    // Do nothing
+  } else {
+    m_currentSortOrderAscending = true;
+
+    const auto currentImagePath = m_imageFilePaths[m_currentIndex];
+
+    // Sort descending order
+    std::sort(m_imageFilePaths.begin(), m_imageFilePaths.end());
+
+    // update m_currentIndex
+    updateCurrentIndexAfterSort(currentImagePath);
+
+    // loadImage and prefetch new next/prev images
+    loadImage(m_imageFilePaths[m_currentIndex]);
+  }
+}
+
+void ImageLoader::updateCurrentIndexAfterSort(const QString &currentImagePath) {
+  auto it = std::find(m_imageFilePaths.begin(), m_imageFilePaths.end(),
+                      currentImagePath);
+  int index = (it != m_imageFilePaths.end())
+                  ? std::distance(m_imageFilePaths.begin(), it)
+                  : -1;
+
+  if (index == -1) {
+    // bad
+  } else {
+    m_currentIndex = index;
+  }
+}
+
+void ImageLoader::sortDescending() {
+  if (m_currentSortOrderAscending) {
+    m_currentSortOrderAscending = false;
+
+    const auto currentImagePath = m_imageFilePaths[m_currentIndex];
+
+    // Sort descending order
+    std::sort(m_imageFilePaths.rbegin(), m_imageFilePaths.rend());
+
+    // update m_currentIndex
+    updateCurrentIndexAfterSort(currentImagePath);
+
+    // loadImage and prefetch new next/prev images
+    loadImage(m_imageFilePaths[m_currentIndex]);
   }
 }
 

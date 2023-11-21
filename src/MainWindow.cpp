@@ -27,6 +27,10 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(this, &MainWindow::goForward, imageLoader, &ImageLoader::goForward);
   connect(this, &MainWindow::deleteCurrentImage, imageLoader,
           &ImageLoader::deleteCurrentImage);
+  connect(this, &MainWindow::sortAscending, imageLoader,
+          &ImageLoader::sortAscending);
+  connect(this, &MainWindow::sortDescending, imageLoader,
+          &ImageLoader::sortDescending);
   connect(imageLoader, &ImageLoader::noMoreImagesLeft, this,
           &MainWindow::onNoMoreImagesLeft);
   connect(imageLoader, &ImageLoader::imageLoaded, this,
@@ -125,6 +129,35 @@ MainWindow::MainWindow() : QMainWindow() {
   viewMenu->addSeparator();
   viewMenu->addAction(slideshowAction);
 
+  // Create the "Sort" menu
+  QMenu *sortOrderMenu = viewMenu->addMenu(tr("Sort Order"));
+
+  // Create action group
+  QActionGroup *sortGroup = new QActionGroup(this);
+
+  // Create actions for "Ascending" and "Descending"
+  QAction *ascendingAction = new QAction(tr("Ascending"), this);
+  QAction *descendingAction = new QAction(tr("Descending"), this);
+
+  // Set checkable property and add actions to the group
+  ascendingAction->setCheckable(true);
+  descendingAction->setCheckable(true);
+  sortGroup->addAction(ascendingAction);
+  sortGroup->addAction(descendingAction);
+
+  // Connect actions to slots
+  connect(ascendingAction, &QAction::triggered, this,
+          [this]() { onChangeSortOrder(true); });
+  connect(descendingAction, &QAction::triggered, this,
+          [this]() { onChangeSortOrder(false); });
+
+  // By default, set "Ascending" as checked
+  ascendingAction->setChecked(true);
+
+  // Add actions to the "Sort" menu
+  sortOrderMenu->addAction(ascendingAction);
+  sortOrderMenu->addAction(descendingAction);
+
   // Create a imageViewer to display the image
   imageViewer = new ImageViewer(this);
   connect(imageViewer, &ImageViewer::copyRequested, this,
@@ -168,7 +201,6 @@ void MainWindow::openImage() {
     /// Save the open path
     m_preferences->set(Preferences::SETTING_PREVIOUS_OPEN_PATH,
                        fileInfo.dir().absolutePath());
-
   }
 }
 
@@ -239,7 +271,8 @@ void MainWindow::copyToLocation() {
 
   QString destinationFilePath = QFileDialog::getSaveFileName(
       this, tr("Save Image"), candidateSaveLocation,
-      tr("Images (*.png *.jpg *.jpeg *.heic *.nef *.tiff *.webp);;All Files (*)"));
+      tr("Images (*.png *.jpg *.jpeg *.heic *.nef *.tiff *.webp);;All Files "
+         "(*)"));
   if (!destinationFilePath.isEmpty()) {
 
     // Open the destination file for writing
@@ -383,6 +416,16 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 }
 
 void MainWindow::showPreferences() { m_preferences->show(); }
+
+void MainWindow::onChangeSortOrder(bool ascending) {
+  if (ascending) {
+    qDebug() << "Ascending sort\n";
+    emit sortAscending();
+  } else {
+    qDebug() << "Descending sort\n";
+    emit sortDescending();
+  }
+}
 
 void MainWindow::settingChangedSlideShowPeriod() {
   slideshowTimer->setInterval(

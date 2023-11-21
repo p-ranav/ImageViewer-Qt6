@@ -44,6 +44,7 @@ public slots:
   void onNoMoreImagesLeft();
   void quickExportAsPng();
   void showPreferences();
+  void onChangeSortOrder(bool ascending);
 
   // Slots for each setting change in the preferences widget
   void settingChangedSlideShowPeriod();
@@ -63,6 +64,8 @@ signals:
   void nextImage(const QPixmap &currentPixmap);
   void goForward();
   void deleteCurrentImage();
+  void sortAscending();
+  void sortDescending();
 
 private:
   void zoomIn();
