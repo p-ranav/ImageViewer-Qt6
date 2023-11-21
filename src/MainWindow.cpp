@@ -349,7 +349,7 @@ void MainWindow::onImageLoaded(const QFileInfo &fileInfo,
 
   setWindowTitle(
       fileInfo.fileName() +
-      QString(" (%1 x %2)").arg(imageInfo.width).arg(imageInfo.height));
+      QString(" (%1 x %2) [%3]").arg(imageInfo.width).arg(imageInfo.height).arg(prettyPrintSize(fileInfo.size())));
 }
 
 void MainWindow::onNoMoreImagesLeft() {
