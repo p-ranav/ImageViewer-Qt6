@@ -22,6 +22,7 @@
 #include <atomic>
 #include "IconHelper.hpp"
 #include <QSettings>
+#include "Preferences.hpp"
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -38,8 +39,12 @@ public slots:
   void copyToLocation();
   void onImageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap, const ImageInfo& imageInfo);
   void onNoMoreImagesLeft();
-
   void quickExportAsPng();
+  void showPreferences();
+
+  // Slots for each setting change in the preferences widget
+  void settingChangedSlideShowPeriod();
+  void settingChangedSlideShowLoop();
 
 protected:
   void closeEvent(QCloseEvent *event) override;
@@ -49,6 +54,7 @@ protected:
 
 signals:
   void loadImage(const QString &imagePath);
+  void goToStart();
   void goBackward();
   void previousImage(const QPixmap &currentPixmap);
   void nextImage(const QPixmap &currentPixmap);
@@ -85,5 +91,7 @@ private:
   std::atomic<bool> m_fullScreen{false};
 
   QTimer *slideshowTimer;
-  constexpr static inline int m_timerIntervalMs{2500};
+  std::atomic<bool> m_slideshowLoop;
+
+  Preferences *m_preferences;
 };

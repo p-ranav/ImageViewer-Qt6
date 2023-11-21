@@ -6,6 +6,12 @@ MainWindow::MainWindow() : QMainWindow() {
   QRect primaryScreenGeometry = QApplication::primaryScreen()->geometry();
   setGeometry(primaryScreenGeometry);
 
+  m_preferences = new Preferences();
+  connect(m_preferences, &Preferences::settingChangedSlideShowPeriod, this,
+          &MainWindow::settingChangedSlideShowPeriod);
+  connect(m_preferences, &Preferences::settingChangedSlideShowLoop, this,
+          &MainWindow::settingChangedSlideShowLoop);
+
   // Create the image loader and move it to a separate thread
   imageLoader = new ImageLoader;
   imageLoaderThread = new QThread;
@@ -13,6 +19,7 @@ MainWindow::MainWindow() : QMainWindow() {
 
   // Connect signals and slots for image loading
   connect(this, &MainWindow::loadImage, imageLoader, &ImageLoader::loadImage);
+  connect(this, &MainWindow::goToStart, imageLoader, &ImageLoader::goToStart);
   connect(this, &MainWindow::goBackward, imageLoader, &ImageLoader::goBackward);
   connect(this, &MainWindow::previousImage, imageLoader,
           &ImageLoader::previousImage);
@@ -63,6 +70,11 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(quickExportAction, &QAction::triggered, this,
           &MainWindow::quickExportAsPng);
 
+  // Create an "Zen mode" action
+  QAction *preferencesAction = new QAction("Preferences", this);
+  connect(preferencesAction, &QAction::triggered, this,
+          &MainWindow::showPreferences);
+
   // Create an "Zoom In" action
   QAction *zoomInAction = new QAction("Zoom In", this);
   zoomInAction->setShortcut(QKeySequence("Ctrl++"));
@@ -79,9 +91,13 @@ MainWindow::MainWindow() : QMainWindow() {
           &MainWindow::startSlideshow);
 
   slideshowTimer = new QTimer(this);
-  slideshowTimer->setInterval(m_timerIntervalMs);
+  slideshowTimer->setInterval(
+      m_preferences->get(Preferences::SETTING_SLIDESHOW_PERIOD, 2500).toInt());
   connect(slideshowTimer, &QTimer::timeout, this,
           &MainWindow::slideshowTimerCallback);
+
+  m_slideshowLoop =
+      m_preferences->get(Preferences::SETTING_SLIDESHOW_LOOP, false).toBool();
 
   // Create an "Zen mode" action
   QAction *zenModeAction = new QAction("Toggle Zen Mode", this);
@@ -96,6 +112,7 @@ MainWindow::MainWindow() : QMainWindow() {
   fileMenu->addAction(deleteAction);
   fileMenu->addSeparator();
   fileMenu->addAction(quickExportAction);
+  fileMenu->addAction(preferencesAction);
   viewMenu->addAction(zoomInAction);
   viewMenu->addAction(zoomOutAction);
   viewMenu->addSeparator();
@@ -349,7 +366,17 @@ void MainWindow::zoomIn() { imageViewer->zoomIn(); }
 void MainWindow::zoomOut() { imageViewer->zoomOut(); }
 
 void MainWindow::slideshowTimerCallback() {
-  emit nextImage(imageViewer->pixmap());
+  if (imageLoader->hasNext()) {
+    emit nextImage(imageViewer->pixmap());
+  } else {
+    /// No more images left
+
+    /// Check if slideshow is configured to loop
+    if (m_slideshowLoop) {
+      /// Restart slideshow
+      emit goToStart();
+    }
+  }
 }
 
 void MainWindow::startSlideshow() { slideshowTimer->start(); }
@@ -409,4 +436,16 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
     break;
   }
   /// QMainWindow::keyPressEvent(event);
+}
+
+void MainWindow::showPreferences() { m_preferences->show(); }
+
+void MainWindow::settingChangedSlideShowPeriod() {
+  slideshowTimer->setInterval(
+      m_preferences->get(Preferences::SETTING_SLIDESHOW_PERIOD, 2500).toInt());
+}
+
+void MainWindow::settingChangedSlideShowLoop() {
+  m_slideshowLoop =
+      m_preferences->get(Preferences::SETTING_SLIDESHOW_LOOP, false).toBool();
 }

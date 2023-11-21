@@ -47,6 +47,7 @@ public:
 
 public slots:
   void loadImage(const QString &imagePath);
+  void goToStart();
   void goBackward();
   void previousImage(const QPixmap &currentPixmap);
   void nextImage(const QPixmap &currentPixmap);

@@ -152,6 +152,11 @@ void ImageLoader::loadImage(const QString &imagePath) {
   }
 }
 
+void ImageLoader::goToStart() {
+  m_currentIndex = 0;
+  loadImage(QString::fromStdString(m_imageFilePaths[m_currentIndex]));
+}
+
 bool ImageLoader::hasPrevious() const {
   return m_imageFilePaths.size() > 0 && (m_currentIndex >= 1);
 }
