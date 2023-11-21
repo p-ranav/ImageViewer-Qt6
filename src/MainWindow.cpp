@@ -1,5 +1,8 @@
 #include "MainWindow.hpp"
 
+#define CONNECT_TO_IMAGE_LOADER(signal_slot_name) \
+  connect(this, &MainWindow::signal_slot_name, imageLoader, &ImageLoader::signal_slot_name, Qt::QueuedConnection);
+
 MainWindow::MainWindow() : QMainWindow() {
 
   // Create a fixed-size QPixmap on startup
@@ -18,24 +21,16 @@ MainWindow::MainWindow() : QMainWindow() {
   imageLoader->moveToThread(imageLoaderThread);
 
   // Connect signals and slots for image loading
-  connect(this, &MainWindow::loadImage, imageLoader, &ImageLoader::loadImage,
-          Qt::QueuedConnection);
-  connect(this, &MainWindow::goToStart, imageLoader, &ImageLoader::goToStart,
-          Qt::QueuedConnection);
-  connect(this, &MainWindow::goBackward, imageLoader, &ImageLoader::goBackward,
-          Qt::QueuedConnection);
-  connect(this, &MainWindow::previousImage, imageLoader,
-          &ImageLoader::previousImage, Qt::QueuedConnection);
-  connect(this, &MainWindow::nextImage, imageLoader, &ImageLoader::nextImage,
-          Qt::QueuedConnection);
-  connect(this, &MainWindow::goForward, imageLoader, &ImageLoader::goForward,
-          Qt::QueuedConnection);
-  connect(this, &MainWindow::deleteCurrentImage, imageLoader,
-          &ImageLoader::deleteCurrentImage, Qt::QueuedConnection);
-  connect(this, &MainWindow::sortAscending, imageLoader,
-          &ImageLoader::sortAscending, Qt::QueuedConnection);
-  connect(this, &MainWindow::sortDescending, imageLoader,
-          &ImageLoader::sortDescending, Qt::QueuedConnection);
+  CONNECT_TO_IMAGE_LOADER(loadImage);
+  CONNECT_TO_IMAGE_LOADER(goToStart);
+  CONNECT_TO_IMAGE_LOADER(goBackward);
+  CONNECT_TO_IMAGE_LOADER(previousImage);
+  CONNECT_TO_IMAGE_LOADER(nextImage);
+  CONNECT_TO_IMAGE_LOADER(goForward);
+  CONNECT_TO_IMAGE_LOADER(deleteCurrentImage);
+  CONNECT_TO_IMAGE_LOADER(sortAscending);
+  CONNECT_TO_IMAGE_LOADER(sortDescending);
+
   connect(imageLoader, &ImageLoader::noMoreImagesLeft, this,
           &MainWindow::onNoMoreImagesLeft, Qt::QueuedConnection);
   connect(imageLoader, &ImageLoader::imageLoaded, this,
