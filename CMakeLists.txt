@@ -31,7 +31,7 @@ set(RESOURCES
 # Generate rules for building source files from the resources
 qt6_add_resources(RESOURCE_FILES ${RESOURCES})
 
-add_executable(${PROJECT_NAME} src/main.cpp src/main_window.cpp src/image_loader.cpp src/image_viewer.cpp src/Preferences.cpp ${RESOURCE_FILES})
+add_executable(${PROJECT_NAME} src/main.cpp src/MainWindow.cpp src/ImageLoader.cpp src/ImageViewer.cpp src/Preferences.cpp ${RESOURCE_FILES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${LibRaw_INCLUDE_DIRS} ${LibExif_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LibRaw_LIBRARIES} ${LibExif_LIBRARIES} Qt6::Core Qt6::Widgets )

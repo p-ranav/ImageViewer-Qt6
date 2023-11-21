@@ -6,10 +6,11 @@
 #include <QPoint>
 #include <QPinchGesture>
 #include <QtWidgets>
-#include <iostream>
 #include <QMenu>
 #include <QAction>
 #include <QClipboard>
+
+#include <iostream>
 #include <optional>
 
 class ImageViewer : public QGraphicsView {

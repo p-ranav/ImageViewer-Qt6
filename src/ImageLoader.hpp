@@ -8,13 +8,16 @@
 #include <QMessageBox>
 #include <libraw/libraw.h>
 #include <QFileInfo>
-#include <vector>
-#include <string>
 #include <QDir>
 #include <QFile>
-#include <libexif/exif-data.h>
-#include "image_info.hpp"
 #include <QColorSpace>
+
+#include <libexif/exif-data.h>
+
+#include "ImageInfo.hpp"
+
+#include <vector>
+#include <string>
 
 class ImageLoader : public QObject {
   Q_OBJECT

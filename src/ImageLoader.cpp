@@ -1,4 +1,4 @@
-#include "image_loader.hpp"
+#include "ImageLoader.hpp"
 #include <filesystem>
 #include <iostream>
 namespace fs = std::filesystem;

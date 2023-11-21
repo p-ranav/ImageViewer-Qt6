@@ -1,5 +1,4 @@
 #pragma once
-#include "image_loader.hpp"
 #include <QApplication>
 #include <QCloseEvent>
 #include <QFileDialog>
@@ -16,13 +15,16 @@
 #include <QMainWindow>
 #include <QToolButton>
 #include <QMenuBar>
-#include "image_viewer.hpp"
+#include <QSettings>
+
+#include "ImageLoader.hpp"
+#include "ImageViewer.hpp"
+#include "IconHelper.hpp"
+#include "Preferences.hpp"
+
 #include <chrono>
 #include <iostream>
 #include <atomic>
-#include "IconHelper.hpp"
-#include <QSettings>
-#include "Preferences.hpp"
 
 class MainWindow : public QMainWindow {
   Q_OBJECT

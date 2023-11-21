@@ -1,4 +1,4 @@
-#include "image_viewer.hpp"
+#include "ImageViewer.hpp"
 
 ImageViewer::ImageViewer(QWidget *parent) : QGraphicsView(parent) {
   setScene(&m_scene);
