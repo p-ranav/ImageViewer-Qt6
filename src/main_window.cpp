@@ -49,7 +49,7 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(openAction, &QAction::triggered, this, &MainWindow::openImage);
 
   // Create a "Copy to clipboard" action
-  QAction *copyToClipboardAction = new QAction("Copy to clipboard", this);
+  QAction *copyToClipboardAction = new QAction("Copy Image", this);
   copyToClipboardAction->setShortcut(QKeySequence("Ctrl+C"));
   connect(copyToClipboardAction, &QAction::triggered, this,
           &MainWindow::copyToClipboard);
@@ -65,7 +65,7 @@ MainWindow::MainWindow() : QMainWindow() {
           &MainWindow::copyToLocation);
 
   // Create a "Delete" action
-  QAction *deleteAction = new QAction("Delete", this);
+  QAction *deleteAction = new QAction("Delete Image", this);
   deleteAction->setShortcut(QKeySequence("Ctrl+D"));
   connect(deleteAction, &QAction::triggered, this,
           &MainWindow::confirmAndDeleteCurrentImage);
@@ -112,9 +112,11 @@ MainWindow::MainWindow() : QMainWindow() {
 
   // Add the "Open" action to the "File" menu
   fileMenu->addAction(openAction);
+  fileMenu->addSeparator();
   fileMenu->addAction(copyToClipboardAction);
   fileMenu->addAction(copyImagePathAction);
   fileMenu->addAction(copyToLocationAction);
+  fileMenu->addSeparator();
   fileMenu->addAction(deleteAction);
   fileMenu->addSeparator();
   fileMenu->addAction(quickExportAction);
