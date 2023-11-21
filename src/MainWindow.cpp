@@ -155,6 +155,8 @@ void MainWindow::openImage() {
     emit loadImage(imagePath);
 
     QFileInfo fileInfo(imagePath);
+  } else {
+    m_firstLoad = false;
   }
 }
 
