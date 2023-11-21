@@ -22,6 +22,7 @@ MainWindow::MainWindow() : QMainWindow() {
   imageLoader->moveToThread(imageLoaderThread);
 
   // Connect signals and slots for image loading
+  CONNECT_TO_IMAGE_LOADER(resetImageFilePaths);
   CONNECT_TO_IMAGE_LOADER(loadImage);
   CONNECT_TO_IMAGE_LOADER(goToStart);
   CONNECT_TO_IMAGE_LOADER(goBackward);
@@ -236,7 +237,7 @@ void MainWindow::openImage() {
   if (!imagePath.isEmpty()) {
     // Emit a signal to load the image in a separate thread
 
-    imageLoader->resetImageFilePaths();
+    emit resetImageFilePaths();
     emit loadImage(imagePath);
 
     QFileInfo fileInfo(imagePath);

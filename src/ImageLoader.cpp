@@ -37,6 +37,25 @@ void ImageLoader::loadImagePathsIfEmpty(const char *directory,
   if (m_imageFilePaths.empty()) {
     m_imageFilePaths = getImageFiles(directory);
 
+    /// Use the current sort settings and sort
+    /// this vector of paths
+    ImageLoader::SortFunction compare_fn;
+    if (m_currentSortByType == SortBy::name) {
+      compare_fn = compareFilePathsByName;
+    } else if (m_currentSortByType == SortBy::size) {
+      compare_fn = compareFilePathsBySize;
+    } else if (m_currentSortByType == SortBy::date_modified) {
+      compare_fn = compareFilePathsByDateModified;
+    }
+
+    if (m_currentSortOrder == SortOrder::ascending) {
+      // Sort ascending order
+      std::sort(m_imageFilePaths.begin(), m_imageFilePaths.end(), compare_fn);
+    } else {
+      // Sort descending order
+      std::sort(m_imageFilePaths.rbegin(), m_imageFilePaths.rend(), compare_fn);
+    }
+
     auto it = std::find(m_imageFilePaths.begin(), m_imageFilePaths.end(),
                         current_file);
     int index = (it != m_imageFilePaths.end())
@@ -48,10 +67,6 @@ void ImageLoader::loadImagePathsIfEmpty(const char *directory,
     } else {
       m_currentIndex = index;
     }
-
-    /// Use the current sort settings and sort
-    /// this vector of paths
-    sort();
   }
 }
 
@@ -346,7 +361,7 @@ void ImageLoader::updateCurrentIndexAfterSort(const QString &currentImagePath) {
 void ImageLoader::sortAscending(const ImageLoader::SortFunction &compare_fn) {
   const auto currentImagePath = m_imageFilePaths[m_currentIndex];
 
-  // Sort descending order
+  // Sort ascending order
   std::sort(m_imageFilePaths.begin(), m_imageFilePaths.end(), compare_fn);
 
   // update m_currentIndex

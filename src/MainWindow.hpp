@@ -57,6 +57,7 @@ protected:
   void keyPressEvent(QKeyEvent *event) override;
 
 signals:
+  void resetImageFilePaths();
   void loadImage(const QString &imagePath);
   void goToStart();
   void goBackward();

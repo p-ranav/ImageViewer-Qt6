@@ -55,13 +55,13 @@ class ImageLoader : public QObject {
 
 public:
   ImageLoader();
-  void resetImageFilePaths();
   QString getCurrentImageFilePath();
   QPixmap getCurrentImageFullRes();
   bool hasNext() const;
   bool hasPrevious() const;
 
 public slots:
+  void resetImageFilePaths();
   void loadImage(const QString &imagePath);
   void goToStart();
   void goBackward();
