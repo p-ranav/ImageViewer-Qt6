@@ -73,9 +73,6 @@ private:
   qreal getScaleFactor() const;
 
 private:
-  std::atomic<bool> m_firstLoad{true};
-  constexpr static inline QSize m_minSize{500, 500};
-
   QLabel canvasLabel;
 
   ImageLoader *imageLoader;
