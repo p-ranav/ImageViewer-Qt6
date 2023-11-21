@@ -23,13 +23,18 @@ void ImageViewer::setPixmap(const QPixmap &pixmap, int desiredWidth,
 
   // Calculate the scale factors to achieve the desired width and height while
   // maintaining aspect ratio
-  qreal scaleFactorWidth = static_cast<qreal>(desiredWidth) / pixmap.width();
-  qreal scaleFactorHeight = static_cast<qreal>(desiredHeight) / pixmap.height();
-  qreal scaleFactor = qMin(scaleFactorWidth, scaleFactorHeight);
+  if (pixmap.width() > desiredWidth || pixmap.height() > desiredHeight) {
+    qreal scaleFactorWidth = static_cast<qreal>(desiredWidth) / pixmap.width();
+    qreal scaleFactorHeight =
+        static_cast<qreal>(desiredHeight) / pixmap.height();
+    qreal scaleFactor = qMin(scaleFactorWidth, scaleFactorHeight);
 
-  // Scale the QGraphicsPixmapItem
-  QGraphicsView::resetTransform();
-  scale(scaleFactor);
+    // Scale the QGraphicsPixmapItem
+    QGraphicsView::resetTransform();
+    scale(scaleFactor);
+  } else {
+    QGraphicsView::resetTransform();
+  }
 
   // Center the QGraphicsPixmapItem in the window
   auto offset = -QRectF(pixmap.rect()).center();
