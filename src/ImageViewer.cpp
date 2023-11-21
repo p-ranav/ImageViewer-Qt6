@@ -51,11 +51,17 @@ void ImageViewer::scale(qreal s) { QGraphicsView::scale(s, s); }
 
 void ImageViewer::resize(int desiredWidth, int desiredHeight) {
   const auto &pixmap = m_item.pixmap();
-  qreal scaleFactorWidth = static_cast<qreal>(desiredWidth) / pixmap.width();
-  qreal scaleFactorHeight = static_cast<qreal>(desiredHeight) / pixmap.height();
-  qreal scaleFactor = qMin(scaleFactorWidth, scaleFactorHeight);
-  QGraphicsView::resetTransform();
-  scale(scaleFactor);
+
+  if (pixmap.width() > desiredWidth || pixmap.height() > desiredHeight) {
+    qreal scaleFactorWidth = static_cast<qreal>(desiredWidth) / pixmap.width();
+    qreal scaleFactorHeight =
+        static_cast<qreal>(desiredHeight) / pixmap.height();
+    qreal scaleFactor = qMin(scaleFactorWidth, scaleFactorHeight);
+    QGraphicsView::resetTransform();
+    scale(scaleFactor);
+  } else {
+    QGraphicsView::resetTransform();
+  }
 
   // Center the QGraphicsPixmapItem in the window
   auto offset = -QRectF(pixmap.rect()).center();

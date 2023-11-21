@@ -104,12 +104,6 @@ MainWindow::MainWindow() : QMainWindow() {
   m_slideshowLoop =
       m_preferences->get(Preferences::SETTING_SLIDESHOW_LOOP, false).toBool();
 
-  // Create an "Zen mode" action
-  QAction *zenModeAction = new QAction("Toggle Zen Mode", this);
-  zenModeAction->setShortcut(QKeySequence("Ctrl+Z"));
-  connect(zenModeAction, &QAction::triggered, this,
-          &MainWindow::toggleFullScreen);
-
   // Add the "Open" action to the "File" menu
   fileMenu->addAction(openAction);
   fileMenu->addSeparator();
@@ -125,7 +119,6 @@ MainWindow::MainWindow() : QMainWindow() {
   viewMenu->addAction(zoomOutAction);
   viewMenu->addSeparator();
   viewMenu->addAction(slideshowAction);
-  viewMenu->addAction(zenModeAction);
 
   // Create a imageViewer to display the image
   imageViewer = new ImageViewer(this);
@@ -138,37 +131,6 @@ MainWindow::MainWindow() : QMainWindow() {
   auto vstackLayout = new QVBoxLayout();
   vstackLayout->addWidget(imageViewer);
   m_centralWidget->setLayout(vstackLayout);
-
-  // Left Arrow (Previous Image button)
-  m_leftArrowButton = new QPushButton(this);
-  m_leftArrowButton->setFixedSize(40, 40);
-  connect(m_leftArrowButton, &QPushButton::pressed,
-          [this]() { emit previousImage(imageViewer->pixmap()); });
-  m_leftArrowButton->setStyleSheet("background: transparent;");
-
-  // Right Arrow (Next Image button)
-  m_rightArrowButton = new QPushButton(this);
-  m_rightArrowButton->setFixedSize(40, 40);
-  connect(m_rightArrowButton, &QPushButton::pressed,
-          [this]() { emit nextImage(imageViewer->pixmap()); });
-  m_rightArrowButton->setStyleSheet("background: transparent;");
-
-  // Create a layout and add buttons to it
-  m_toolbarWidget = new QWidget(this);
-  QHBoxLayout *buttonLayout = new QHBoxLayout();
-  buttonLayout->addWidget(m_leftArrowButton);
-  buttonLayout->addWidget(m_rightArrowButton);
-  m_toolbarWidget->setLayout(buttonLayout);
-
-  vstackLayout->addWidget(m_toolbarWidget, 0, Qt::AlignCenter);
-
-  // Set the icon with a specific color
-  QColor iconColor(Qt::white); // Set your desired color
-  m_leftArrowIcon = createColorIcon(":/images/left_arrow.png", iconColor, 24);
-  m_leftArrowButton->setIcon(m_leftArrowIcon);
-
-  m_rightArrowIcon = createColorIcon(":/images/right_arrow.png", iconColor, 24);
-  m_rightArrowButton->setIcon(m_rightArrowIcon);
 
   m_centralWidget->setStyleSheet(
       "background-color: rgb(25, 25, 25); padding: 0px;");
@@ -297,25 +259,6 @@ void MainWindow::onImageLoaded(const QFileInfo &fileInfo,
   setWindowTitle(
       fileInfo.fileName() +
       QString(" (%1 x %2)").arg(imageInfo.width).arg(imageInfo.height));
-
-  if (!imageLoader->hasPrevious()) {
-    m_leftArrowIcon =
-        createColorIcon(":/images/left_arrow.png", QColor(35, 35, 35), 24);
-    m_leftArrowButton->setIcon(m_leftArrowIcon);
-  } else {
-    m_leftArrowIcon = createColorIcon(":/images/left_arrow.png", Qt::white, 24);
-    m_leftArrowButton->setIcon(m_leftArrowIcon);
-  }
-
-  if (!imageLoader->hasNext()) {
-    m_rightArrowIcon =
-        createColorIcon(":/images/right_arrow.png", QColor(35, 35, 35), 24);
-    m_rightArrowButton->setIcon(m_rightArrowIcon);
-  } else {
-    m_rightArrowIcon =
-        createColorIcon(":/images/right_arrow.png", Qt::white, 24);
-    m_rightArrowButton->setIcon(m_rightArrowIcon);
-  }
 }
 
 void MainWindow::onNoMoreImagesLeft() {
@@ -394,34 +337,7 @@ void MainWindow::slideshowTimerCallback() {
 
 void MainWindow::startSlideshow() { slideshowTimer->start(); }
 
-void MainWindow::toggleFullScreen() {
-
-  if (m_fullScreen) {
-    m_fullScreen = false;
-
-    imageViewer->setPixmap(imageViewer->pixmap(), width() * getScaleFactor(),
-                           height() * getScaleFactor());
-
-    showNormal();
-    m_toolbarWidget->show();
-
-  } else {
-    m_fullScreen = true;
-    imageViewer->setPixmap(imageViewer->pixmap(), width() * getScaleFactor(),
-                           height() * getScaleFactor());
-
-    m_toolbarWidget->hide();
-    showFullScreen();
-  }
-}
-
-qreal MainWindow::getScaleFactor() const {
-  if (m_fullScreen) {
-    return 1;
-  } else {
-    return SCALE_FACTOR;
-  }
-}
+qreal MainWindow::getScaleFactor() const { return 1; }
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {
 

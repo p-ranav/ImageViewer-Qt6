@@ -70,7 +70,6 @@ private:
   void slideshowTimerCallback();
   void startSlideshow();
   void confirmAndDeleteCurrentImage();
-  void toggleFullScreen();
   qreal getScaleFactor() const;
 
 private:
