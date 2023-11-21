@@ -18,6 +18,7 @@ class Preferences : public QWidget {
     QCheckBox* m_slideshowLoop;
 
 public:
+    constexpr static inline char SETTING_PREVIOUS_OPEN_PATH[] = "openPath";
     constexpr static inline char SETTING_SLIDESHOW_PERIOD[] = "slideShowTimerIntervalMs";
     constexpr static inline char SETTING_SLIDESHOW_LOOP[] = "slideShowLoopAfterEnd";
 

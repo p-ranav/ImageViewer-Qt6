@@ -75,10 +75,13 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(quickExportAction, &QAction::triggered, this,
           &MainWindow::quickExportAsPng);
 
-  // Create an "Zen mode" action
   QAction *preferencesAction = new QAction("Preferences", this);
   connect(preferencesAction, &QAction::triggered, this,
           &MainWindow::showPreferences);
+
+  QAction *quitAction = new QAction("Quit", this);
+  quitAction->setShortcut(QKeySequence("Ctrl+Q"));
+  connect(quitAction, &QAction::triggered, this, &QApplication::quit);
 
   // Create an "Zoom In" action
   QAction *zoomInAction = new QAction("Zoom In", this);
@@ -114,7 +117,9 @@ MainWindow::MainWindow() : QMainWindow() {
   fileMenu->addAction(deleteAction);
   fileMenu->addSeparator();
   fileMenu->addAction(quickExportAction);
+  fileMenu->addSeparator();
   fileMenu->addAction(preferencesAction);
+  fileMenu->addAction(quitAction);
   viewMenu->addAction(zoomInAction);
   viewMenu->addAction(zoomOutAction);
   viewMenu->addSeparator();
@@ -145,8 +150,12 @@ void MainWindow::openImage() {
   QString fileFilter = "Images (*.png *.jpg *.jpeg *.nef "
                        "*.tiff *.webp)";
 
+  QString previousOpenPath =
+      m_preferences->get(Preferences::SETTING_PREVIOUS_OPEN_PATH, "")
+          .toString();
+
   QString imagePath = QFileDialog::getOpenFileName(
-      this, "Open Image", /*QDir::homePath()*/ "", fileFilter);
+      this, "Open Image", previousOpenPath, fileFilter);
 
   if (!imagePath.isEmpty()) {
     // Emit a signal to load the image in a separate thread
@@ -155,6 +164,11 @@ void MainWindow::openImage() {
     emit loadImage(imagePath);
 
     QFileInfo fileInfo(imagePath);
+
+    /// Save the open path
+    m_preferences->set(Preferences::SETTING_PREVIOUS_OPEN_PATH,
+                       fileInfo.dir().absolutePath());
+
   } else {
     m_firstLoad = false;
   }
