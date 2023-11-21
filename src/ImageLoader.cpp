@@ -14,7 +14,7 @@ std::vector<std::string> getImageFiles(const char *directory) {
                      ::tolower);
 
       const std::vector<std::string> allowedExtensions = {
-          ".jpg", ".jpeg", ".png", ".nef", ".tiff", ".webp"};
+          ".jpg", ".jpeg", ".png", ".nef", ".heic", ".tiff", ".webp"};
 
       if (std::find(allowedExtensions.begin(), allowedExtensions.end(),
                     extension) != allowedExtensions.end()) {

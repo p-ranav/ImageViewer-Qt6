@@ -147,7 +147,7 @@ MainWindow::MainWindow() : QMainWindow() {
 
 void MainWindow::openImage() {
   // Open a file dialog to select an image
-  QString fileFilter = "Images (*.png *.jpg *.jpeg *.nef "
+  QString fileFilter = "Images (*.png *.jpg *.jpeg *.heic *.nef "
                        "*.tiff *.webp)";
 
   QString previousOpenPath =
@@ -239,7 +239,7 @@ void MainWindow::copyToLocation() {
 
   QString destinationFilePath = QFileDialog::getSaveFileName(
       this, tr("Save Image"), candidateSaveLocation,
-      tr("Images (*.png *.jpg *.bmp);;All Files (*)"));
+      tr("Images (*.png *.jpg *.jpeg *.heic *.nef *.tiff *.webp);;All Files (*)"));
   if (!destinationFilePath.isEmpty()) {
 
     // Open the destination file for writing
