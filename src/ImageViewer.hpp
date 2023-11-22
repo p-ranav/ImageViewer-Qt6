@@ -22,10 +22,6 @@ class ImageViewer : public QGraphicsView {
   static constexpr inline qreal ZOOM_IN_SCALE = 1.04;
   static constexpr inline qreal ZOOM_OUT_SCALE = 0.96;
 
-signals:
-    void copyRequested();
-    void deleteRequested();
-
 public:
   ImageViewer(QWidget *parent = nullptr);
   void setPixmap(const QPixmap &pixmap, int desiredWidth, int desiredHeight);
