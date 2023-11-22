@@ -69,7 +69,7 @@ public slots:
   void previousImage(const QPixmap &currentPixmap);
   void nextImage(const QPixmap &currentPixmap);
   void goForward();
-  void deleteCurrentImage();
+  void deleteCurrentImage(const QFileInfo& fileInfo);
   void changeSortOrder(SortOrder order);
   void changeSortBy(SortBy type);
   void copyCurrentImageFullResToClipboard();

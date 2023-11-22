@@ -264,67 +264,79 @@ void ImageLoader::slideShowNext(const QPixmap &currentPixmap, bool loop) {
   }
 }
 
-void ImageLoader::deleteCurrentImage() {
+void ImageLoader::deleteCurrentImage(const QFileInfo &fileInfo) {
 
-  auto imagePath = m_imageFilePaths[m_currentIndex];
+  auto it = std::find(m_imageFilePaths.begin(), m_imageFilePaths.end(),
+                      fileInfo.absoluteFilePath());
+  int index = (it != m_imageFilePaths.end())
+                  ? std::distance(m_imageFilePaths.begin(), it)
+                  : -1;
 
-  // Delete image
-  QFile file(imagePath);
-  file.moveToTrash();
+  // Make sure that the index is same as m_currentIndex
+  if (index != -1 && static_cast<std::size_t>(index) == m_currentIndex) {
+    auto imagePath = m_imageFilePaths[m_currentIndex];
 
-  // Delete path from tracked list of paths
-  m_imageFilePaths.erase(
-      std::remove(m_imageFilePaths.begin(), m_imageFilePaths.end(), imagePath),
-      m_imageFilePaths.end());
+    // Delete image
+    QFile file(imagePath);
+    file.moveToTrash();
 
-  // if possible, move to next image
-  if (m_imageFilePaths.size() > 0 &&
-      m_currentIndex <= m_imageFilePaths.size() - 1) {
+    // Delete path from tracked list of paths
+    m_imageFilePaths.erase(std::remove(m_imageFilePaths.begin(),
+                                       m_imageFilePaths.end(), imagePath),
+                           m_imageFilePaths.end());
 
-    /// more images available
-    /// currentIndex now points to the "next" image that
-    /// should be shown
-    /// no change needed to index
+    // if possible, move to next image
+    if (m_imageFilePaths.size() > 0 &&
+        m_currentIndex <= m_imageFilePaths.size() - 1) {
 
-    /// This new image is what used to be nextPixmap
-    /// So just emit that and update newPixmap
-    /// previousPixmap remains the same
+      /// more images available
+      /// currentIndex now points to the "next" image that
+      /// should be shown
+      /// no change needed to index
 
-    QFileInfo fileInfo(m_imageFilePaths[m_currentIndex]);
+      /// This new image is what used to be nextPixmap
+      /// So just emit that and update newPixmap
+      /// previousPixmap remains the same
 
-    // Emit nextPixmap as current pixmap
-    emit imageLoaded(fileInfo, m_nextPixmap, m_nextImageInfo);
+      QFileInfo fileInfo(m_imageFilePaths[m_currentIndex]);
 
-    m_currentImageInfo = m_nextImageInfo;
+      // Emit nextPixmap as current pixmap
+      emit imageLoaded(fileInfo, m_nextPixmap, m_nextImageInfo);
 
-    if (m_currentIndex + 1 < m_imageFilePaths.size()) {
-      // Prefetch load a new image into nextPixmap
-      m_nextImageInfo = loadImageIntoPixmap(
-          m_imageFilePaths[m_currentIndex + 1], m_nextPixmap);
+      m_currentImageInfo = m_nextImageInfo;
+
+      if (m_currentIndex + 1 < m_imageFilePaths.size()) {
+        // Prefetch load a new image into nextPixmap
+        m_nextImageInfo = loadImageIntoPixmap(
+            m_imageFilePaths[m_currentIndex + 1], m_nextPixmap);
+      }
+    } else if (m_imageFilePaths.size() > 0) {
+      /// Previous condition was not true
+
+      /// At least one more image available in m_imageFilePaths
+      /// We were at the last image in the list
+
+      /// Set the previous pixmap as the new current
+
+      m_currentIndex -= 1;
+
+      QFileInfo fileInfo(m_imageFilePaths[m_currentIndex]);
+
+      // Emit previousPixmap as current pixmap
+      emit imageLoaded(fileInfo, m_previousPixmap, m_previousImageInfo);
+
+      m_currentImageInfo = m_previousImageInfo;
+
+      // Prefetch load a new image into previousPixmap
+      m_previousImageInfo = loadImageIntoPixmap(
+          m_imageFilePaths[m_currentIndex - 1], m_previousPixmap);
+
+    } else {
+      emit noMoreImagesLeft();
     }
-  } else if (m_imageFilePaths.size() > 0) {
-    /// Previous condition was not true
-
-    /// At least one more image available in m_imageFilePaths
-    /// We were at the last image in the list
-
-    /// Set the previous pixmap as the new current
-
-    m_currentIndex -= 1;
-
-    QFileInfo fileInfo(m_imageFilePaths[m_currentIndex]);
-
-    // Emit previousPixmap as current pixmap
-    emit imageLoaded(fileInfo, m_previousPixmap, m_previousImageInfo);
-
-    m_currentImageInfo = m_previousImageInfo;
-
-    // Prefetch load a new image into previousPixmap
-    m_previousImageInfo = loadImageIntoPixmap(
-        m_imageFilePaths[m_currentIndex - 1], m_previousPixmap);
-
   } else {
-    emit noMoreImagesLeft();
+    /// TODO: Something wrong
+    qDebug() << index << " " << m_currentIndex;
   }
 }
 

@@ -137,10 +137,6 @@ MainWindow::MainWindow() : QMainWindow() {
 
   // Create a imageViewer to display the image
   imageViewer = new ImageViewer(this);
-  connect(imageViewer, &ImageViewer::copyRequested, this,
-          &MainWindow::copyToClipboard);
-  connect(imageViewer, &ImageViewer::deleteRequested, this,
-          &MainWindow::deleteCurrentImage);
 
   m_centralWidget = new QWidget(this);
   auto vstackLayout = new QVBoxLayout();
@@ -334,7 +330,8 @@ void MainWindow::confirmAndDeleteCurrentImage() {
 
   // Display a confirmation dialog
   QMessageBox::StandardButton reply = QMessageBox::question(
-      this, "Delete Confirmation", "Do you really want to delete this item?",
+      this, "Delete Confirmation",
+      "Do you really want to delete " + m_currentFileInfo.fileName(),
       QMessageBox::Yes | QMessageBox::No);
 
   grabKeyboard();
@@ -343,7 +340,7 @@ void MainWindow::confirmAndDeleteCurrentImage() {
 
   // Check the user's response
   if (reply == QMessageBox::Yes) {
-    emit deleteCurrentImage();
+    emit deleteCurrentImage(m_currentFileInfo);
   } else {
     // User clicked 'No' or closed the dialog
     qDebug() << "Deletion canceled.";
