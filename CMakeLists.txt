@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(HelloWorldQt)
+project(ImageViewer)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
