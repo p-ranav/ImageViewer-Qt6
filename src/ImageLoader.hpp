@@ -17,6 +17,7 @@
 #include <libexif/exif-data.h>
 
 #include "ImageInfo.hpp"
+#include "Preferences.hpp"
 #include "SortOptions.hpp"
 
 #include <vector>
@@ -41,9 +42,9 @@ class ImageLoader : public QObject {
   SortBy m_currentSortByType{SortBy::name};
 
   void loadImagePathsIfEmpty(const char* directory, const char* current_file);
-  ImageInfo loadRaw(const QString &imagePath, QPixmap& imagePixmap, bool half_size);
+  ImageInfo loadRaw(const QString &imagePath, QPixmap& imagePixmap);
   ImageInfo loadWithImageReader(const QString &imagePath, QPixmap& imagePixmap);
-  ImageInfo loadImageIntoPixmap(const QString &imagePath, QPixmap& imagePixmap, bool half_size);
+  ImageInfo loadImageIntoPixmap(const QString &imagePath, QPixmap& imagePixmap);
   void updateCurrentIndexAfterSort(const QString& currentImagePath);
   
   static bool compareFilePathsByName(const QString &a, const QString &b);
@@ -73,6 +74,7 @@ public slots:
   void changeSortBy(SortBy type);
   void copyCurrentImageFullResToClipboard();
   void slideShowNext(const QPixmap& currentPixmap, bool loop);
+  void reloadCurrentImage();
 
 signals:
   void imageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap, const ImageInfo& imageInfo);

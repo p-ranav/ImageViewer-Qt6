@@ -34,11 +34,14 @@ MainWindow::MainWindow() : QMainWindow() {
   CONNECT_TO_IMAGE_LOADER(changeSortBy);
   CONNECT_TO_IMAGE_LOADER(copyCurrentImageFullResToClipboard);
   CONNECT_TO_IMAGE_LOADER(slideShowNext);
+  CONNECT_TO_IMAGE_LOADER(reloadCurrentImage);
 
   connect(imageLoader, &ImageLoader::noMoreImagesLeft, this,
           &MainWindow::onNoMoreImagesLeft, Qt::QueuedConnection);
   connect(imageLoader, &ImageLoader::imageLoaded, this,
           &MainWindow::onImageLoaded, Qt::QueuedConnection);
+  connect(m_preferences, &Preferences::rawSettingChanged, this,
+          &MainWindow::onRawSettingChanged, Qt::QueuedConnection);
 
   // Start the thread
   imageLoaderThread->start();
@@ -428,3 +431,5 @@ void MainWindow::settingChangedSlideShowLoop() {
   m_slideshowLoop =
       m_preferences->get(Preferences::SETTING_SLIDESHOW_LOOP, false).toBool();
 }
+
+void MainWindow::onRawSettingChanged() { emit reloadCurrentImage(); }

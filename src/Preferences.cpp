@@ -1,9 +1,6 @@
 #include "Preferences.hpp"
 
-Preferences::Preferences(QWidget *parent) : QWidget(parent) {
-  m_settings = new QSettings("p-ranav", "ImageViewer");
-  setupUi();
-}
+Preferences::Preferences(QWidget *parent) : QWidget(parent) { setupUi(); }
 
 QVariant Preferences::get(QAnyStringView key, const QVariant &defaultValue) {
   return m_settings->value(key, defaultValue);
@@ -25,9 +22,9 @@ void Preferences::setupUi() {
   QWidget *tab2 = setupSlideshowTab();
   tabWidget->addTab(tab2, "Slideshow");
 
-  // Third tab
-  QWidget *tab3 = new QWidget;
-  tabWidget->addTab(tab3, "Tab 3");
+  // Third tab ("RAW")
+  QWidget *tab3 = setupRawTab();
+  tabWidget->addTab(tab3, "RAW");
 
   // Set up the layout
   QVBoxLayout *layout = new QVBoxLayout(this);
@@ -62,6 +59,35 @@ QWidget *Preferences::setupSlideshowTab() {
   return tab2;
 }
 
+QWidget *Preferences::setupRawTab() {
+  QWidget *tab3 = new QWidget;
+  QFormLayout *formLayout = new QFormLayout(tab3);
+
+  // RAW half-size setting
+  m_rawHalfSize = new QCheckBox("Load RAW images half size");
+  if (get(SETTING_RAW_HALF_SIZE, true).toBool()) {
+    m_rawHalfSize->setChecked(true);
+  } else {
+    m_rawHalfSize->setChecked(false);
+  }
+  connect(m_rawHalfSize, &QCheckBox::stateChanged, this,
+          &Preferences::handleEditingFinished_halfSize);
+  formLayout->addRow(m_rawHalfSize);
+
+  // RAW auto-wb setting
+  m_rawAutoWb = new QCheckBox("Use automatic white balance");
+  if (get(SETTING_RAW_AUTO_WB, false).toBool()) {
+    m_rawAutoWb->setChecked(true);
+  } else {
+    m_rawAutoWb->setChecked(false);
+  }
+  connect(m_rawAutoWb, &QCheckBox::stateChanged, this,
+          &Preferences::handleEditingFinished_autoWb);
+  formLayout->addRow(m_rawAutoWb);
+
+  return tab3;
+}
+
 void Preferences::handleEditingFinished_slideshowPeriod() {
   m_slideshowPeriod->clearFocus();
 
@@ -94,4 +120,28 @@ void Preferences::handleEditingFinished_slideshowLoop(int state) {
     set(SETTING_SLIDESHOW_LOOP, false);
     qDebug() << "Preferences::Slideshow Loop: False";
   }
+}
+
+void Preferences::handleEditingFinished_halfSize(int state) {
+  if (state == Qt::Checked) {
+    set(SETTING_RAW_HALF_SIZE, true);
+    qDebug() << "Preferences::RAW Half size: True";
+  } else {
+    set(SETTING_RAW_HALF_SIZE, false);
+    qDebug() << "Preferences::RAW Half size: False";
+  }
+
+  emit rawSettingChanged();
+}
+
+void Preferences::handleEditingFinished_autoWb(int state) {
+  if (state == Qt::Checked) {
+    set(SETTING_RAW_AUTO_WB, true);
+    qDebug() << "Preferences::RAW auto wb: True";
+  } else {
+    set(SETTING_RAW_AUTO_WB, false);
+    qDebug() << "Preferences::RAW auto wb: False";
+  }
+
+  emit rawSettingChanged();
 }

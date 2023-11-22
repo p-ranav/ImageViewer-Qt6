@@ -49,6 +49,8 @@ public slots:
   void settingChangedSlideShowPeriod();
   void settingChangedSlideShowLoop();
 
+  void onRawSettingChanged();
+
 protected:
   void closeEvent(QCloseEvent *event) override;
   void resizeEvent(QResizeEvent* event) override;
@@ -68,6 +70,7 @@ signals:
   void changeSortBy(SortBy type);
   void copyCurrentImageFullResToClipboard();
   void slideShowNext(const QPixmap& currentPixmap, bool loop);
+  void reloadCurrentImage();
 
 private:
   void createSortOrderMenu(QMenu * viewMenu);

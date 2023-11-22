@@ -28,9 +28,7 @@ std::vector<QString> getImageFiles(const char *directory) {
   return imageFiles;
 }
 
-ImageLoader::ImageLoader() : QObject() {
-  // m_rawProcessor.imgdata.params.use_auto_wb = 1;
-}
+ImageLoader::ImageLoader() : QObject() {}
 
 void ImageLoader::loadImagePathsIfEmpty(const char *directory,
                                         const char *current_file) {
@@ -70,14 +68,17 @@ void ImageLoader::loadImagePathsIfEmpty(const char *directory,
   }
 }
 
-ImageInfo ImageLoader::loadRaw(const QString &imagePath, QPixmap &imagePixmap,
-                               bool half_size) {
+ImageInfo ImageLoader::loadRaw(const QString &imagePath, QPixmap &imagePixmap) {
 
   ImageInfo result;
 
   m_rawProcessor.open_file(imagePath.toLocal8Bit().data());
 
-  m_rawProcessor.imgdata.params.half_size = half_size ? 1 : 0;
+  m_rawProcessor.imgdata.params.half_size =
+      Preferences::get(Preferences::SETTING_RAW_HALF_SIZE, true).toBool() ? 1
+                                                                          : 0;
+  m_rawProcessor.imgdata.params.use_auto_wb =
+      Preferences::get(Preferences::SETTING_RAW_AUTO_WB, true).toBool() ? 1 : 0;
 
   m_rawProcessor.unpack();
   m_rawProcessor.dcraw_process();
@@ -127,15 +128,14 @@ ImageInfo ImageLoader::loadWithImageReader(const QString &imagePath,
 }
 
 ImageInfo ImageLoader::loadImageIntoPixmap(const QString &imagePath,
-                                           QPixmap &imagePixmap,
-                                           bool half_size) {
+                                           QPixmap &imagePixmap) {
   QFileInfo fileInfo(imagePath);
 
   QStringList rawFormats = {"nef", "cr2", "arw", "dng", "orf",
                             "pef", "rw2", "srw", "crw", "raf"};
 
   if (rawFormats.contains(fileInfo.suffix().toLower())) {
-    return loadRaw(imagePath, imagePixmap, half_size);
+    return loadRaw(imagePath, imagePixmap);
   } else {
     return loadWithImageReader(imagePath, imagePixmap);
   }
@@ -153,18 +153,18 @@ void ImageLoader::loadImage(const QString &imagePath) {
 
   loadImagePathsIfEmpty(fileInfo.dir().absolutePath().toLocal8Bit().data(),
                         fileInfo.absoluteFilePath().toLocal8Bit().data());
-  m_currentImageInfo = loadImageIntoPixmap(imagePath, imagePixmap, true);
+  m_currentImageInfo = loadImageIntoPixmap(imagePath, imagePixmap);
 
   emit imageLoaded(fileInfo, imagePixmap, m_currentImageInfo);
 
   // Prefetch next and previous images
   if (m_currentIndex >= 1) {
     m_previousImageInfo = loadImageIntoPixmap(
-        m_imageFilePaths[m_currentIndex - 1], m_previousPixmap, true);
+        m_imageFilePaths[m_currentIndex - 1], m_previousPixmap);
   }
   if (m_currentIndex + 1 < m_imageFilePaths.size()) {
-    m_nextImageInfo = loadImageIntoPixmap(m_imageFilePaths[m_currentIndex + 1],
-                                          m_nextPixmap, true);
+    m_nextImageInfo =
+        loadImageIntoPixmap(m_imageFilePaths[m_currentIndex + 1], m_nextPixmap);
   }
 }
 
@@ -200,7 +200,7 @@ void ImageLoader::previousImage(const QPixmap &currentPixmap) {
     emit imageLoaded(fileInfo, m_previousPixmap, m_previousImageInfo);
 
     m_previousImageInfo = loadImageIntoPixmap(
-        m_imageFilePaths[m_currentIndex - 1], m_previousPixmap, true);
+        m_imageFilePaths[m_currentIndex - 1], m_previousPixmap);
   }
 }
 
@@ -223,7 +223,7 @@ void ImageLoader::nextImage(const QPixmap &currentPixmap) {
 
     if (m_currentIndex + 1 < m_imageFilePaths.size()) {
       m_nextImageInfo = loadImageIntoPixmap(
-          m_imageFilePaths[m_currentIndex + 1], m_nextPixmap, true);
+          m_imageFilePaths[m_currentIndex + 1], m_nextPixmap);
     }
   }
 }
@@ -244,7 +244,7 @@ void ImageLoader::copyCurrentImageFullResToClipboard() {
   auto imagePath = m_imageFilePaths[m_currentIndex];
 
   QPixmap imagePixmap;
-  m_currentImageInfo = loadImageIntoPixmap(imagePath, imagePixmap, false);
+  m_currentImageInfo = loadImageIntoPixmap(imagePath, imagePixmap);
 
   QClipboard *clipboard = QGuiApplication::clipboard();
   clipboard->setPixmap(imagePixmap);
@@ -300,7 +300,7 @@ void ImageLoader::deleteCurrentImage() {
     if (m_currentIndex + 1 < m_imageFilePaths.size()) {
       // Prefetch load a new image into nextPixmap
       m_nextImageInfo = loadImageIntoPixmap(
-          m_imageFilePaths[m_currentIndex + 1], m_nextPixmap, true);
+          m_imageFilePaths[m_currentIndex + 1], m_nextPixmap);
     }
   } else if (m_imageFilePaths.size() > 0) {
     /// Previous condition was not true
@@ -321,7 +321,7 @@ void ImageLoader::deleteCurrentImage() {
 
     // Prefetch load a new image into previousPixmap
     m_previousImageInfo = loadImageIntoPixmap(
-        m_imageFilePaths[m_currentIndex - 1], m_previousPixmap, true);
+        m_imageFilePaths[m_currentIndex - 1], m_previousPixmap);
 
   } else {
     emit noMoreImagesLeft();
@@ -424,4 +424,9 @@ void ImageLoader::changeSortBy(SortBy type) {
     m_currentSortByType = type;
     sort();
   }
+}
+
+void ImageLoader::reloadCurrentImage() {
+  /// Reload this image
+  loadImage(m_imageFilePaths[m_currentIndex]);
 }
