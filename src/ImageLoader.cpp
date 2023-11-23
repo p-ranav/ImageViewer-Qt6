@@ -151,11 +151,11 @@ void ImageLoader::loadImage(const QString &imagePath) {
   QFileInfo fileInfo(imagePath);
   QPixmap imagePixmap;
 
-  m_currentImageInfo = loadImageIntoPixmap(imagePath, imagePixmap);
-  emit imageLoaded(fileInfo, imagePixmap, m_currentImageInfo);
-
   loadImagePathsIfEmpty(fileInfo.dir().absolutePath().toLocal8Bit().data(),
                         fileInfo.absoluteFilePath().toLocal8Bit().data());
+
+  m_currentImageInfo = loadImageIntoPixmap(imagePath, imagePixmap);
+  emit imageLoaded(fileInfo, imagePixmap, m_currentImageInfo);
 
   // Prefetch next and previous images
   if (m_currentIndex >= 1) {
