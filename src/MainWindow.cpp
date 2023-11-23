@@ -112,7 +112,17 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(firstImageAction, &QAction::triggered, this,
           [this]() { emit goToFirstImage(); });
 
-  // First Image
+  // Previous Image
+  QAction *previousImageAction = new QAction("Previous Image", this);
+  connect(previousImageAction, &QAction::triggered, this,
+          [this]() { emit previousImage(imageViewer->pixmap()); });
+
+  // Next Image
+  QAction *nextImageAction = new QAction("Next Image", this);
+  connect(nextImageAction, &QAction::triggered, this,
+          [this]() { emit nextImage(imageViewer->pixmap()); });
+
+  // Last Image
   QAction *lastImageAction = new QAction("Last Image", this);
   connect(lastImageAction, &QAction::triggered, this,
           [this]() { emit goToLastImage(); });
@@ -145,6 +155,8 @@ MainWindow::MainWindow() : QMainWindow() {
   viewMenu->addSeparator();
   viewMenu->addAction(slideshowAction);
   goMenu->addAction(firstImageAction);
+  goMenu->addAction(previousImageAction);
+  goMenu->addAction(nextImageAction);
   goMenu->addAction(lastImageAction);
 
   createSortByMenu(viewMenu);
