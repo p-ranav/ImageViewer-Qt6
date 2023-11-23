@@ -14,8 +14,6 @@
 #include <QGuiApplication>
 #include <QClipboard>
 
-#include <libexif/exif-data.h>
-
 #include "ImageInfo.hpp"
 #include "Preferences.hpp"
 #include "SortOptions.hpp"
