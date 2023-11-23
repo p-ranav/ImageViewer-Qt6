@@ -73,6 +73,8 @@ public slots:
   void copyCurrentImageFullResToClipboard();
   void slideShowNext(const QPixmap& currentPixmap, bool loop);
   void reloadCurrentImage();
+  void goToFirstImage();
+  void goToLastImage();
 
 signals:
   void imageLoaded(const QFileInfo& imageFileInfo, const QPixmap &imagePixmap, const ImageInfo& imageInfo);

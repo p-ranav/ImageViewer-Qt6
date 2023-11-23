@@ -35,6 +35,8 @@ MainWindow::MainWindow() : QMainWindow() {
   CONNECT_TO_IMAGE_LOADER(copyCurrentImageFullResToClipboard);
   CONNECT_TO_IMAGE_LOADER(slideShowNext);
   CONNECT_TO_IMAGE_LOADER(reloadCurrentImage);
+  CONNECT_TO_IMAGE_LOADER(goToFirstImage);
+  CONNECT_TO_IMAGE_LOADER(goToLastImage);
 
   connect(imageLoader, &ImageLoader::noMoreImagesLeft, this,
           &MainWindow::onNoMoreImagesLeft, Qt::QueuedConnection);
@@ -53,6 +55,7 @@ MainWindow::MainWindow() : QMainWindow() {
   // Create a "File" menu
   QMenu *fileMenu = menuBar->addMenu("File");
   QMenu *viewMenu = menuBar->addMenu("View");
+  QMenu *goMenu = menuBar->addMenu("Go");
 
   // Create an "Open" action
   QAction *openAction = new QAction("Open...", this);
@@ -104,6 +107,16 @@ MainWindow::MainWindow() : QMainWindow() {
   connect(slideshowAction, &QAction::triggered, this,
           &MainWindow::startSlideshow);
 
+  // First Image
+  QAction *firstImageAction = new QAction("First Image", this);
+  connect(firstImageAction, &QAction::triggered, this,
+          [this]() { emit goToFirstImage(); });
+
+  // First Image
+  QAction *lastImageAction = new QAction("Last Image", this);
+  connect(lastImageAction, &QAction::triggered, this,
+          [this]() { emit goToLastImage(); });
+
   slideshowTimer = new QTimer(this);
 
   auto interval =
@@ -131,6 +144,8 @@ MainWindow::MainWindow() : QMainWindow() {
   viewMenu->addAction(zoomOutAction);
   viewMenu->addSeparator();
   viewMenu->addAction(slideshowAction);
+  goMenu->addAction(firstImageAction);
+  goMenu->addAction(lastImageAction);
 
   createSortByMenu(viewMenu);
   createSortOrderMenu(viewMenu);

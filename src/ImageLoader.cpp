@@ -442,3 +442,13 @@ void ImageLoader::reloadCurrentImage() {
   /// Reload this image
   loadImage(m_imageFilePaths[m_currentIndex]);
 }
+
+void ImageLoader::goToFirstImage() {
+  m_currentIndex = 0;
+  loadImage(m_imageFilePaths[m_currentIndex]);
+}
+
+void ImageLoader::goToLastImage() {
+  m_currentIndex = m_imageFilePaths.size() - 1;
+  loadImage(m_imageFilePaths[m_currentIndex]);
+}

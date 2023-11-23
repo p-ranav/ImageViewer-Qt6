@@ -71,6 +71,8 @@ signals:
   void copyCurrentImageFullResToClipboard();
   void slideShowNext(const QPixmap& currentPixmap, bool loop);
   void reloadCurrentImage();
+  void goToFirstImage();
+  void goToLastImage();
 
 private:
   void createSortOrderMenu(QMenu * viewMenu);
