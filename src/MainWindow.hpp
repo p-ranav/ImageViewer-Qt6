@@ -17,6 +17,7 @@
 #include <QMenuBar>
 #include <QSettings>
 
+#include "ExifHelper.hpp"
 #include "ImageLoader.hpp"
 #include "ImageViewer.hpp"
 #include "IconHelper.hpp"

@@ -309,6 +309,12 @@ void MainWindow::onImageLoaded(const QFileInfo &fileInfo,
 
   m_currentFileInfo = fileInfo;
 
+  if (m_currentFileInfo.suffix().toLower() == "jpg" ||
+      m_currentFileInfo.suffix().toLower() == "tiff" ||
+      m_currentFileInfo.suffix().toLower() == "png") {
+    readExifData(m_currentFileInfo.absoluteFilePath().toStdString().data());
+  }
+
   // Set the resized image to the QLabel
   imageViewer->setPixmap(imagePixmap, width() * getScaleFactor(),
                          height() * getScaleFactor());
