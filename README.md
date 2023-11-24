@@ -1,3 +1,5 @@
+## MacOS
+
 ```console
 brew install libraw qt@6
 mkdir build
@@ -5,6 +7,8 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=Release -DQt6_DIR=$(brew --prefix qt6)/lib/cmake/Qt6 -DLibRaw_INCLUDE_DIRS=$(brew --prefix libraw)/include -DLibRaw_LIBRARIES=$(brew --prefix libraw)/lib/libraw.dylib ..
 make
 ```
+
+## Ubuntu
 
 ```console
 sudo apt install libraw-dev qt6-base-dev
