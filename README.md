@@ -1,3 +1,6 @@
+
+<img width="874" alt="example" src="https://github.com/p-ranav/ImageViewer-Qt6/assets/8450091/7d1a47f1-fa2c-4372-bd78-f50158ad6c0d">
+
 ## MacOS
 
 ```console
