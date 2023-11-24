@@ -46,6 +46,7 @@ public slots:
   void showPreferences();
 
   // Slots for each setting change in the preferences widget
+  void settingChangedBackgroundColor(const QColor& color);
   void settingChangedSlideShowPeriod();
   void settingChangedSlideShowLoop();
 

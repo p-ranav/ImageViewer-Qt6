@@ -15,8 +15,8 @@ void Preferences::setupUi() {
   QTabWidget *tabWidget = new QTabWidget(this);
 
   // First tab
-  QWidget *tab1 = new QWidget;
-  tabWidget->addTab(tab1, "Tab 1");
+  QWidget *tab1 = setupViewTab();
+  tabWidget->addTab(tab1, "General");
 
   // Second tab ("Slideshow")
   QWidget *tab2 = setupSlideshowTab();
@@ -29,6 +29,56 @@ void Preferences::setupUi() {
   // Set up the layout
   QVBoxLayout *layout = new QVBoxLayout(this);
   layout->addWidget(tabWidget);
+}
+
+QWidget *Preferences::setupViewTab() {
+  // Second tab ("Slideshow")
+  QWidget *tab1 = new QWidget;
+  QFormLayout *formLayout = new QFormLayout(tab1);
+
+  QLabel *backgroundLabel = new QLabel("Background", this);
+  m_colorPickerButton = new QPushButton(this);
+  m_colorPickerButton->setFixedSize(30, 30);
+  auto savedColor =
+      get(SETTING_BACKGROUND_COLOR, QRect(25, 25, 25, 255)).toRect();
+  auto r = savedColor.x();
+  auto g = savedColor.y();
+  auto b = savedColor.width();
+  auto a = savedColor.height();
+  QString styleSheet =
+      QString("background-color: %1").arg(QColor(r, g, b, a).name());
+  m_colorPickerButton->setStyleSheet(styleSheet);
+
+  connect(m_colorPickerButton, &QPushButton::clicked, this, [this]() {
+    auto savedColor =
+        get(SETTING_BACKGROUND_COLOR, QRect(25, 25, 25, 255)).toRect();
+    auto r = savedColor.x();
+    auto g = savedColor.y();
+    auto b = savedColor.width();
+    auto a = savedColor.height();
+
+    // Open color dialog and get selected color
+    QColor color =
+        QColorDialog::getColor(QColor(r, g, b, a), this, "Select Color",
+                               QColorDialog::ShowAlphaChannel);
+
+    // Set the background color of the main window
+    if (color.isValid()) {
+      /// do work
+      QString styleSheet = QString("background-color: %1").arg(color.name());
+      m_colorPickerButton->setStyleSheet(styleSheet);
+
+      set(SETTING_BACKGROUND_COLOR,
+          QRect(color.red(), color.green(), color.blue(), color.alpha()));
+
+      /// Let the mainWindow know
+      emit settingChangedBackgroundColor(color);
+    }
+  });
+
+  formLayout->addRow(backgroundLabel, m_colorPickerButton);
+
+  return tab1;
 }
 
 QWidget *Preferences::setupSlideshowTab() {

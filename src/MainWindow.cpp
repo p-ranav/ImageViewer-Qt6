@@ -15,6 +15,10 @@ MainWindow::MainWindow() : QMainWindow() {
           &MainWindow::settingChangedSlideShowPeriod);
   connect(m_preferences, &Preferences::settingChangedSlideShowLoop, this,
           &MainWindow::settingChangedSlideShowLoop);
+  connect(m_preferences, &Preferences::settingChangedBackgroundColor, this,
+          &MainWindow::settingChangedBackgroundColor, Qt::QueuedConnection);
+  connect(m_preferences, &Preferences::rawSettingChanged, this,
+          &MainWindow::onRawSettingChanged, Qt::QueuedConnection);
 
   // Create the image loader and move it to a separate thread
   imageLoader = new ImageLoader;
@@ -42,8 +46,6 @@ MainWindow::MainWindow() : QMainWindow() {
           &MainWindow::onNoMoreImagesLeft, Qt::QueuedConnection);
   connect(imageLoader, &ImageLoader::imageLoaded, this,
           &MainWindow::onImageLoaded, Qt::QueuedConnection);
-  connect(m_preferences, &Preferences::rawSettingChanged, this,
-          &MainWindow::onRawSettingChanged, Qt::QueuedConnection);
 
   // Start the thread
   imageLoaderThread->start();
@@ -170,8 +172,14 @@ MainWindow::MainWindow() : QMainWindow() {
   vstackLayout->addWidget(imageViewer);
   m_centralWidget->setLayout(vstackLayout);
 
-  m_centralWidget->setStyleSheet(
-      "background-color: rgb(25, 25, 25); padding: 0px;");
+  auto savedColor = Preferences::get(Preferences::SETTING_BACKGROUND_COLOR,
+                                     QRect(25, 25, 25, 255))
+                        .toRect();
+  auto r = savedColor.x();
+  auto g = savedColor.y();
+  auto b = savedColor.width();
+  auto a = savedColor.height();
+  settingChangedBackgroundColor(QColor(r, g, b, a));
 
   setCentralWidget(m_centralWidget);
 
@@ -445,6 +453,12 @@ void MainWindow::keyPressEvent(QKeyEvent *event) {
 }
 
 void MainWindow::showPreferences() { m_preferences->show(); }
+
+void MainWindow::settingChangedBackgroundColor(const QColor &color) {
+  QString styleSheet =
+      QString("background-color: %1; padding: 0px;").arg(color.name());
+  m_centralWidget->setStyleSheet(styleSheet);
+}
 
 void MainWindow::settingChangedSlideShowPeriod() {
   slideshowTimer->setInterval(
