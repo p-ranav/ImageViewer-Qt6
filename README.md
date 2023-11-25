@@ -3,7 +3,7 @@
 
 # Features
 
-- Load common image types such as `.jpg`, `.png`, `.tiff`, and raw types like `.nef`.
+- Load common image types such as `.jpg`, `.png`, `.tiff`, and raw types like `.nef` and `.cr2`.
 - Zoom and pan with trackpad/mouse.
 - Copy image to clipboard.
 - Copy image path.
